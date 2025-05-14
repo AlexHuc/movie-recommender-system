@@ -1,5 +1,12 @@
-CLI: python Evaluating/TestMetrics.py
+# Quickstart
 
+1. **Prepare the data**
+Place the MovieLens “latest-small” CSV files under `ml-latest-small/`
+
+2. **Run the evaluation**
+`python Evaluating/TestMetrics.py`
+
+OUTPUT:
 ```bash
 Loading movie ratings...
 
@@ -46,3 +53,12 @@ Diversity:  0.9665208258150911
 
 Novelty (average popularity rank):  491.5767777960256
 ```
+
+3. Interpretation of metrics
+- **RMSE / MAE**: Lower is better—raw prediction accuracy.
+- **HR (Hit Rate)**: Fraction of held-out items that appear in each user’s top-10.
+- **cHR**: Same as HR but only for actual ratings ≥ 4.0 (“do they like it?”).
+- **ARHR**: Weighted hit rate that rewards higher-ranked hits.
+- **Coverage**: Percentage of users who get at least one recommendation ≥ 4.0.
+- **Diversity**: 1 − s, where s is average item-item similarity in the top-10. Higher = more varied.
+- **Novelty**: Average popularity rank of recommended movies (higher means more obscure).

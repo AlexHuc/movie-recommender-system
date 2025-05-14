@@ -38,7 +38,6 @@ evaluator.AddAlgorithm(SVDAlgorithm, "SVD")
 Random = NormalPredictor()
 evaluator.AddAlgorithm(Random, "Random")
 
-
-# Fight!
+# Evaluate the algorithms
 evaluator.Evaluate(True)
 

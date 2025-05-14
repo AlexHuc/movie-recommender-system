@@ -1,4 +1,10 @@
-CLI: python Framework/RecsBakeOff.py
+# Quickstart
+
+1. **Prepare the data**
+Place the MovieLens “latest-small” CSV files under `ml-latest-small/`
+
+2. **Run the evaluation**
+`python Framework/RecsBakeOff.py`
 
 ```bash
 Loading movie ratings...
