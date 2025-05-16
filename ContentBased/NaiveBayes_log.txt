@@ -1,0 +1,65 @@
+Loading movie ratings...
+
+Computing movie popularity ranks so we can measure novelty later...
+Estimating biases using als...
+Computing the cosine similarity matrix...
+Done computing similarity matrix.
+Evaluating algorithms...
+Evaluating  NaiveBayes ...
+Evaluating accuracy...
+Loading movie features for Naive Bayes training...
+Processing ratings data...
+Found 74999 valid ratings from 671 users
+Naive Bayes training complete!
+Analysis complete.
+Evaluating  Random ...
+Evaluating accuracy...
+Analysis complete.
+
+
+Algorithm  RMSE       MAE       
+NaiveBayes 1.1283     0.8338    
+Random     1.4385     1.1478    
+
+Legend:
+
+RMSE:      Root Mean Squared Error. Lower values mean better accuracy.
+MAE:       Mean Absolute Error. Lower values mean better accuracy.
+
+Using recommender  NaiveBayes
+
+Building recommendation model...
+Loading movie features for Naive Bayes training...
+Processing ratings data...
+Found 99997 valid ratings from 671 users
+Naive Bayes training complete!
+Computing recommendations...
+
+We recommend:
+Dumbo (1941) 4.910831145027808
+Pinocchio (1940) 4.910831145027808
+Maltese Falcon, The (1941) 4.910831145027808
+Wizard of Oz, The (1939) 4.910831145027808
+Fantasia (1940) 4.910831145027808
+Bambi (1942) 4.910831145027808
+Steamboat Willie (1928) 4.910831145027808
+Bridge on the River Kwai, The (1957) 4.910831145027808
+Citizen Kane (1941) 4.910831145027808
+Casablanca (1942) 4.910831145027808
+
+Using recommender  Random
+
+Building recommendation model...
+Computing recommendations...
+
+We recommend:
+Sleepers (1996) 5
+Beavis and Butt-Head Do America (1996) 5
+Fear and Loathing in Las Vegas (1998) 5
+Happiness (1998) 5
+Summer of Sam (1999) 5
+Bowling for Columbine (2002) 5
+Babe (1995) 5
+Birdcage, The (1996) 5
+Carlito's Way (1993) 5
+Wizard of Oz, The (1939) 5

@@ -1,0 +1,234 @@
+Loading movie ratings...
+
+Computing movie popularity ranks so we can measure novelty later...
+Estimating biases using als...
+Computing the cosine similarity matrix...
+Done computing similarity matrix.
+Evaluating  PureKNN ...
+Evaluating accuracy...
+Computing content-based similarity matrix...
+Progress: 0.0% (0/33706155) (0 items out of 8211)
+Progress: 2.4% (815650/33706155) (100 items out of 8211)
+Progress: 4.8% (1621300/33706155) (200 items out of 8211)
+Progress: 7.2% (2416950/33706155) (300 items out of 8211)
+Progress: 9.5% (3202600/33706155) (400 items out of 8211)
+Progress: 11.8% (3978250/33706155) (500 items out of 8211)
+Progress: 14.1% (4743900/33706155) (600 items out of 8211)
+Progress: 16.3% (5499550/33706155) (700 items out of 8211)
+Progress: 18.5% (6245200/33706155) (800 items out of 8211)
+Progress: 20.7% (6980850/33706155) (900 items out of 8211)
+Progress: 22.9% (7706500/33706155) (1000 items out of 8211)
+Progress: 25.0% (8422150/33706155) (1100 items out of 8211)
+Progress: 27.1% (9127800/33706155) (1200 items out of 8211)
+Progress: 29.1% (9823450/33706155) (1300 items out of 8211)
+Progress: 31.2% (10509100/33706155) (1400 items out of 8211)
+Progress: 33.2% (11184750/33706155) (1500 items out of 8211)
+Progress: 35.2% (11850400/33706155) (1600 items out of 8211)
+Progress: 37.1% (12506050/33706155) (1700 items out of 8211)
+Progress: 39.0% (13151700/33706155) (1800 items out of 8211)
+Progress: 40.9% (13787350/33706155) (1900 items out of 8211)
+Progress: 42.8% (14413000/33706155) (2000 items out of 8211)
+Progress: 44.6% (15028650/33706155) (2100 items out of 8211)
+Progress: 46.4% (15634300/33706155) (2200 items out of 8211)
+Progress: 48.2% (16229950/33706155) (2300 items out of 8211)
+Progress: 49.9% (16815600/33706155) (2400 items out of 8211)
+Progress: 51.6% (17391250/33706155) (2500 items out of 8211)
+Progress: 53.3% (17956900/33706155) (2600 items out of 8211)
+Progress: 54.9% (18512550/33706155) (2700 items out of 8211)
+Progress: 56.5% (19058200/33706155) (2800 items out of 8211)
+Progress: 58.1% (19593850/33706155) (2900 items out of 8211)
+Progress: 59.7% (20119500/33706155) (3000 items out of 8211)
+Progress: 61.2% (20635150/33706155) (3100 items out of 8211)
+Progress: 62.7% (21140800/33706155) (3200 items out of 8211)
+Progress: 64.2% (21636450/33706155) (3300 items out of 8211)
+Progress: 65.6% (22122100/33706155) (3400 items out of 8211)
+Progress: 67.0% (22597750/33706155) (3500 items out of 8211)
+Progress: 68.4% (23063400/33706155) (3600 items out of 8211)
+Progress: 69.8% (23519050/33706155) (3700 items out of 8211)
+Progress: 71.1% (23964700/33706155) (3800 items out of 8211)
+Progress: 72.4% (24400350/33706155) (3900 items out of 8211)
+Progress: 73.7% (24826000/33706155) (4000 items out of 8211)
+Progress: 74.9% (25241650/33706155) (4100 items out of 8211)
+Progress: 76.1% (25647300/33706155) (4200 items out of 8211)
+Progress: 77.3% (26042950/33706155) (4300 items out of 8211)
+Progress: 78.4% (26428600/33706155) (4400 items out of 8211)
+Progress: 79.5% (26804250/33706155) (4500 items out of 8211)
+Progress: 80.6% (27169900/33706155) (4600 items out of 8211)
+Progress: 81.7% (27525550/33706155) (4700 items out of 8211)
+Progress: 82.7% (27871200/33706155) (4800 items out of 8211)
+Progress: 83.7% (28206850/33706155) (4900 items out of 8211)
+Progress: 84.7% (28532500/33706155) (5000 items out of 8211)
+Progress: 85.6% (28848150/33706155) (5100 items out of 8211)
+Progress: 86.5% (29153800/33706155) (5200 items out of 8211)
+Progress: 87.4% (29449450/33706155) (5300 items out of 8211)
+Progress: 88.2% (29735100/33706155) (5400 items out of 8211)
+Progress: 89.0% (30010750/33706155) (5500 items out of 8211)
+Progress: 89.8% (30276400/33706155) (5600 items out of 8211)
+Progress: 90.6% (30532050/33706155) (5700 items out of 8211)
+Progress: 91.3% (30777700/33706155) (5800 items out of 8211)
+Progress: 92.0% (31013350/33706155) (5900 items out of 8211)
+Progress: 92.7% (31239000/33706155) (6000 items out of 8211)
+Progress: 93.3% (31454650/33706155) (6100 items out of 8211)
+Progress: 93.9% (31660300/33706155) (6200 items out of 8211)
+Progress: 94.5% (31855950/33706155) (6300 items out of 8211)
+Progress: 95.1% (32041600/33706155) (6400 items out of 8211)
+Progress: 95.6% (32217250/33706155) (6500 items out of 8211)
+Progress: 96.1% (32382900/33706155) (6600 items out of 8211)
+Progress: 96.5% (32538550/33706155) (6700 items out of 8211)
+Progress: 97.0% (32684200/33706155) (6800 items out of 8211)
+Progress: 97.4% (32819850/33706155) (6900 items out of 8211)
+Progress: 97.7% (32945500/33706155) (7000 items out of 8211)
+Progress: 98.1% (33061150/33706155) (7100 items out of 8211)
+Progress: 98.4% (33166800/33706155) (7200 items out of 8211)
+Progress: 98.7% (33262450/33706155) (7300 items out of 8211)
+Progress: 98.9% (33348100/33706155) (7400 items out of 8211)
+Progress: 99.2% (33423750/33706155) (7500 items out of 8211)
+Progress: 99.4% (33489400/33706155) (7600 items out of 8211)
+Progress: 99.5% (33545050/33706155) (7700 items out of 8211)
+Progress: 99.7% (33589885/33706155) (7800 items out of 8211)
+Progress: 99.8% (33625735/33706155) (7900 items out of 8211)
+Progress: 99.8% (33651585/33706155) (8000 items out of 8211)
+Progress: 99.9% (33667435/33706155) (8100 items out of 8211)
+Progress: 99.9% (33673276/33706155) (8200 items out of 8211)
+Similarity computation complete!
+Analysis complete.
+Evaluating  Random ...
+Evaluating accuracy...
+Analysis complete.
+
+
+Algorithm  RMSE       MAE       
+PureKNN    0.9375     0.7264    
+Random     1.4385     1.1478    
+
+Legend:
+
+RMSE:      Root Mean Squared Error. Lower values mean better accuracy.
+MAE:       Mean Absolute Error. Lower values mean better accuracy.
+
+Using recommender  PureKNN
+
+Building recommendation model...
+Computing content-based similarity matrix...
+Progress: 0.0% (0/41091645) (0 items out of 9066)
+Progress: 2.2% (901050/41091645) (100 items out of 9066)
+Progress: 4.4% (1792100/41091645) (200 items out of 9066)
+Progress: 6.5% (2673150/41091645) (300 items out of 9066)
+Progress: 8.6% (3544200/41091645) (400 items out of 9066)
+Progress: 10.7% (4405250/41091645) (500 items out of 9066)
+Progress: 12.8% (5256300/41091645) (600 items out of 9066)
+Progress: 14.8% (6097350/41091645) (700 items out of 9066)
+Progress: 16.9% (6928400/41091645) (800 items out of 9066)
+Progress: 18.9% (7749450/41091645) (900 items out of 9066)
+Progress: 20.8% (8560500/41091645) (1000 items out of 9066)
+Progress: 22.8% (9361550/41091645) (1100 items out of 9066)
+Progress: 24.7% (10152600/41091645) (1200 items out of 9066)
+Progress: 26.6% (10933650/41091645) (1300 items out of 9066)
+Progress: 28.5% (11704700/41091645) (1400 items out of 9066)
+Progress: 30.3% (12465750/41091645) (1500 items out of 9066)
+Progress: 32.2% (13216800/41091645) (1600 items out of 9066)
+Progress: 34.0% (13957850/41091645) (1700 items out of 9066)
+Progress: 35.7% (14688900/41091645) (1800 items out of 9066)
+Progress: 37.5% (15409950/41091645) (1900 items out of 9066)
+Progress: 39.2% (16121000/41091645) (2000 items out of 9066)
+Progress: 40.9% (16822050/41091645) (2100 items out of 9066)
+Progress: 42.6% (17513100/41091645) (2200 items out of 9066)
+Progress: 44.3% (18194150/41091645) (2300 items out of 9066)
+Progress: 45.9% (18865200/41091645) (2400 items out of 9066)
+Progress: 47.5% (19526250/41091645) (2500 items out of 9066)
+Progress: 49.1% (20177300/41091645) (2600 items out of 9066)
+Progress: 50.7% (20818350/41091645) (2700 items out of 9066)
+Progress: 52.2% (21449400/41091645) (2800 items out of 9066)
+Progress: 53.7% (22070450/41091645) (2900 items out of 9066)
+Progress: 55.2% (22681500/41091645) (3000 items out of 9066)
+Progress: 56.7% (23282550/41091645) (3100 items out of 9066)
+Progress: 58.1% (23873600/41091645) (3200 items out of 9066)
+Progress: 59.5% (24454650/41091645) (3300 items out of 9066)
+Progress: 60.9% (25025700/41091645) (3400 items out of 9066)
+Progress: 62.3% (25586750/41091645) (3500 items out of 9066)
+Progress: 63.6% (26137800/41091645) (3600 items out of 9066)
+Progress: 64.9% (26678850/41091645) (3700 items out of 9066)
+Progress: 66.2% (27209900/41091645) (3800 items out of 9066)
+Progress: 67.5% (27730950/41091645) (3900 items out of 9066)
+Progress: 68.7% (28242000/41091645) (4000 items out of 9066)
+Progress: 69.9% (28743050/41091645) (4100 items out of 9066)
+Progress: 71.1% (29234100/41091645) (4200 items out of 9066)
+Progress: 72.3% (29715150/41091645) (4300 items out of 9066)
+Progress: 73.5% (30186200/41091645) (4400 items out of 9066)
+Progress: 74.6% (30647250/41091645) (4500 items out of 9066)
+Progress: 75.7% (31098300/41091645) (4600 items out of 9066)
+Progress: 76.8% (31539350/41091645) (4700 items out of 9066)
+Progress: 77.8% (31970400/41091645) (4800 items out of 9066)
+Progress: 78.8% (32391450/41091645) (4900 items out of 9066)
+Progress: 79.8% (32802500/41091645) (5000 items out of 9066)
+Progress: 80.8% (33203550/41091645) (5100 items out of 9066)
+Progress: 81.8% (33594600/41091645) (5200 items out of 9066)
+Progress: 82.7% (33975650/41091645) (5300 items out of 9066)
+Progress: 83.6% (34346700/41091645) (5400 items out of 9066)
+Progress: 84.5% (34707750/41091645) (5500 items out of 9066)
+Progress: 85.3% (35058800/41091645) (5600 items out of 9066)
+Progress: 86.1% (35399850/41091645) (5700 items out of 9066)
+Progress: 87.0% (35730900/41091645) (5800 items out of 9066)
+Progress: 87.7% (36051950/41091645) (5900 items out of 9066)
+Progress: 88.5% (36363000/41091645) (6000 items out of 9066)
+Progress: 89.2% (36664050/41091645) (6100 items out of 9066)
+Progress: 89.9% (36955100/41091645) (6200 items out of 9066)
+Progress: 90.6% (37236150/41091645) (6300 items out of 9066)
+Progress: 91.3% (37507200/41091645) (6400 items out of 9066)
+Progress: 91.9% (37768250/41091645) (6500 items out of 9066)
+Progress: 92.5% (38019300/41091645) (6600 items out of 9066)
+Progress: 93.1% (38260350/41091645) (6700 items out of 9066)
+Progress: 93.7% (38491400/41091645) (6800 items out of 9066)
+Progress: 94.2% (38712450/41091645) (6900 items out of 9066)
+Progress: 94.7% (38923500/41091645) (7000 items out of 9066)
+Progress: 95.2% (39124550/41091645) (7100 items out of 9066)
+Progress: 95.7% (39315600/41091645) (7200 items out of 9066)
+Progress: 96.1% (39496650/41091645) (7300 items out of 9066)
+Progress: 96.5% (39667700/41091645) (7400 items out of 9066)
+Progress: 96.9% (39828750/41091645) (7500 items out of 9066)
+Progress: 97.3% (39979800/41091645) (7600 items out of 9066)
+Progress: 97.6% (40120850/41091645) (7700 items out of 9066)
+Progress: 98.0% (40251900/41091645) (7800 items out of 9066)
+Progress: 98.3% (40372950/41091645) (7900 items out of 9066)
+Progress: 98.5% (40484000/41091645) (8000 items out of 9066)
+Progress: 98.8% (40585050/41091645) (8100 items out of 9066)
+Progress: 99.0% (40676100/41091645) (8200 items out of 9066)
+Progress: 99.2% (40757150/41091645) (8300 items out of 9066)
+Progress: 99.4% (40828200/41091645) (8400 items out of 9066)
+Progress: 99.5% (40888127/41091645) (8500 items out of 9066)
+Progress: 99.6% (40939377/41091645) (8600 items out of 9066)
+Progress: 99.7% (40980627/41091645) (8700 items out of 9066)
+Progress: 99.8% (41011877/41091645) (8800 items out of 9066)
+Progress: 99.9% (41033127/41091645) (8900 items out of 9066)
+Progress: 99.9% (41044314/41091645) (9000 items out of 9066)
+Similarity computation complete!
+Computing recommendations...
+
+We recommend:
+Presidio, The (1988) 3.8413146768729325
+Femme Nikita, La (Nikita) (1990) 3.839613347087336
+Wyatt Earp (1994) 3.8125061475551796
+Shooter, The (1997) 3.8125061475551796
+Bad Girls (1994) 3.8125061475551796
+The Hateful Eight (2015) 3.812506147555179
+True Grit (2010) 3.812506147555179
+Open Range (2003) 3.812506147555179
+Big Easy, The (1987) 3.7835412549266985
+Point Break (1991) 3.764158410102278
+
+Using recommender  Random
+
+Building recommendation model...
+Computing recommendations...
+
+We recommend:
+Sleepers (1996) 5
+Beavis and Butt-Head Do America (1996) 5
+Fear and Loathing in Las Vegas (1998) 5
+Happiness (1998) 5
+Summer of Sam (1999) 5
+Bowling for Columbine (2002) 5
+Babe (1995) 5
+Birdcage, The (1996) 5
+Carlito's Way (1993) 5
+Wizard of Oz, The (1939) 5

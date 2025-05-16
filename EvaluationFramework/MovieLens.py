@@ -7,7 +7,6 @@ from surprise import Dataset
 from surprise import Reader
 
 from collections import defaultdict
-import numpy as np
 
 class MovieLens:
     """
@@ -197,7 +196,7 @@ class MovieLens:
             dict: Mapping movieID -> list of feature values.
         """
         mes = defaultdict(list)
-        with open("LLVisualFeatures13K_Log.csv", newline='') as csvfile:
+        with open("../ml-latest-small/LLVisualFeatures13K_Log.csv", newline='') as csvfile:
             mesReader = csv.reader(csvfile)
             next(mesReader)
             for row in mesReader:

@@ -5,8 +5,8 @@ Module: Evaluator
 Provides a convenient interface to evaluate multiple recommendation algorithms
 on a dataset with various metrics, and to sample top-N recommendations for a user.
 """
-from EvaluationData import EvaluationData
-from EvaluatedAlgorithm import EvaluatedAlgorithm
+from EvaluationFramework.EvaluationData import EvaluationData
+from EvaluationFramework.EvaluatedAlgorithm import EvaluatedAlgorithm
 
 class Evaluator:
     """

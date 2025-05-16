@@ -5,10 +5,10 @@ Created on Thu May  3 11:11:13 2018
 @author: Frank
 """
 
-from MovieLens import MovieLens
+from EvaluationFramework.MovieLens import MovieLens
 from surprise import SVD
 from surprise import NormalPredictor
-from Evaluator import Evaluator
+from EvaluationFramework.Evaluator import Evaluator
 
 import random
 import numpy as np

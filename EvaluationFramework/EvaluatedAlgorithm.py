@@ -6,8 +6,7 @@ Defines a wrapper for Surprise recommendation algorithms that runs a suite of
 evaluation tests including accuracy (RMSE, MAE), top-N recommendation metrics,
 coverage, diversity, and novelty.
 """
-from RecommenderMetrics import RecommenderMetrics
-from EvaluationData import EvaluationData
+from EvaluationFramework.RecommenderMetrics import RecommenderMetrics
 
 class EvaluatedAlgorithm:
     """

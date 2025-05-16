@@ -1,13 +1,15 @@
 # Movie Recommendation System
 
 ## Overview
-This project implements a machine learning-based movie recommendation system using the MovieLens dataset. The system analyzes user preferences and movie features to predict ratings and recommend relevant movies to users.
+This project implements a machine learning-based movie recommendation systems using the MovieLens dataset. The system analyzes user preferences and movie features to predict ratings and recommend relevant movies to users. All algorithms are implemented from scratch in pure Python to demonstrate the underlying mathematics and concepts of recommendation systems.
 
 ## Project Goals
 - Develop accurate prediction models for user movie preferences
 - Compare performance of different recommendation algorithms
 - Create a system that can suggest personalized movie recommendations
 - Analyze user behavior patterns to improve prediction accuracy
+- Implement machine learning algorithms using only core Python (no ML libraries)
+- Evaluate algorithm performance using a custom EvaluationFramework
 
 ## Dataset
 The project uses the MovieLens dataset provided by GroupLens Research. This dataset includes:
@@ -15,18 +17,36 @@ The project uses the MovieLens dataset provided by GroupLens Research. This data
 - Movie metadata including titles, genres, and tags
 - User rating history and tagging behavior
 
-## Features
-- Collaborative filtering algorithms (user-based and item-based)
-- Content-based recommendation using movie features
-- Hybrid recommendation approaches
-- Model evaluation and performance metrics
-- Visualization of recommendation patterns
+## Implemented Algorithms
+
+### 1. Collaborative Filtering
+**User-Based Collaborative Filtering**
+- K-Nearest Neighbors (KNN) from scratch
+- Cosine similarity / Pearson correlation implementations
+
+**Item-Based Collaborative Filtering**
+- KNN with item similarity
+- Matrix factorization
+
+### 2. Matrix Factorization Techniques
+- Singular Value Decomposition (SVD)
+- SVD++
+- Non-negative Matrix Factorization (NMF)
+- Alternating Least Squares (ALS)
+- Probabilistic Matrix Factorization (PMF)
+
+### 3. Content-Based Filtering
+- Logistic Regression
+- Decision Trees
+- Naive Bayes
+- Support Vector Machines (SVM)
+- k-NN with feature vectors
+- TF-IDF + Cosine similarity (for text-based content)
 
 ## Technologies
-- Python for data processing and model implementation
+- Python for data processing and pure algorithm implementation
 - Pandas and NumPy for data manipulation
-- Scikit-learn for machine learning components
-- TensorFlow/PyTorch for deep learning models
+- Custom EvaluationFramework builded on surprise library for testing and comparing algorithms
 - Matplotlib/Seaborn for data visualization
 
 ## Getting Started
@@ -38,19 +58,13 @@ The project uses the MovieLens dataset provided by GroupLens Research. This data
 6. Generate recommendations using the trained models
 
 ## Project Structure
-- `/data`: Contains the MovieLens dataset
+- `/ml-latest-small`: Contains the MovieLens dataset
+- `/ContentBased`: Implementations of content-based filtering algorithms
+- `/CollaborativeFiltering`: Implementations of collaborative filtering algorithms
+- `/MatrixFactorization`: Implementations of matrix factorization techniques
+- `/EvaluationFramework`: Custom framework for evaluating algorithm performance
 - `/notebooks`: Jupyter notebooks for exploration and model development
-- `/src`: Source code for the recommendation system
 - `/models`: Saved model files
-- `/evaluation`: Scripts and results for model evaluation
-- `/docs`: Additional documentation
-
-## Future Enhancements
-- Integration with external movie APIs
-- Real-time recommendation capabilities
-- User interface for exploring recommendations
-- Incorporation of temporal dynamics in user preferences
-- Deployment as a web service
 
 ## Acknowledgments
 - MovieLens dataset provided by GroupLens Research at the University of Minnesota

@@ -1,0 +1,199 @@
+Loading movie ratings...
+
+Computing movie popularity ranks so we can measure novelty later...
+Estimating biases using als...
+Computing the cosine similarity matrix...
+Done computing similarity matrix.
+Evaluating algorithms...
+Evaluating  PureSVM ...
+Evaluating accuracy...
+Preparing movie features for SVM training...
+Created feature vectors for 8207 movies
+Training individual SVM models for each user...
+Progress: 1.5% (Trained models for 10 users out of 671)
+Progress: 3.0% (Trained models for 20 users out of 671)
+Progress: 4.5% (Trained models for 30 users out of 671)
+Progress: 6.0% (Trained models for 40 users out of 671)
+Progress: 7.5% (Trained models for 50 users out of 671)
+Progress: 8.9% (Trained models for 60 users out of 671)
+Progress: 10.4% (Trained models for 70 users out of 671)
+Progress: 11.9% (Trained models for 80 users out of 671)
+Progress: 13.4% (Trained models for 90 users out of 671)
+Progress: 14.9% (Trained models for 100 users out of 671)
+Progress: 16.4% (Trained models for 110 users out of 671)
+Progress: 17.9% (Trained models for 120 users out of 671)
+Progress: 19.4% (Trained models for 130 users out of 671)
+Progress: 20.9% (Trained models for 140 users out of 671)
+Progress: 22.4% (Trained models for 150 users out of 671)
+Progress: 23.8% (Trained models for 160 users out of 671)
+Progress: 25.3% (Trained models for 170 users out of 671)
+Progress: 26.8% (Trained models for 180 users out of 671)
+Progress: 28.3% (Trained models for 190 users out of 671)
+Progress: 29.8% (Trained models for 200 users out of 671)
+Progress: 31.3% (Trained models for 210 users out of 671)
+Progress: 32.8% (Trained models for 220 users out of 671)
+Progress: 34.3% (Trained models for 230 users out of 671)
+Progress: 35.8% (Trained models for 240 users out of 671)
+Progress: 37.3% (Trained models for 250 users out of 671)
+Progress: 38.7% (Trained models for 260 users out of 671)
+Progress: 40.2% (Trained models for 270 users out of 671)
+Progress: 41.7% (Trained models for 280 users out of 671)
+Progress: 43.2% (Trained models for 290 users out of 671)
+Progress: 44.7% (Trained models for 300 users out of 671)
+Progress: 46.2% (Trained models for 310 users out of 671)
+Progress: 47.7% (Trained models for 320 users out of 671)
+Progress: 49.2% (Trained models for 330 users out of 671)
+Progress: 50.7% (Trained models for 340 users out of 671)
+Progress: 52.2% (Trained models for 350 users out of 671)
+Progress: 53.7% (Trained models for 360 users out of 671)
+Progress: 55.1% (Trained models for 370 users out of 671)
+Progress: 56.6% (Trained models for 380 users out of 671)
+Progress: 58.1% (Trained models for 390 users out of 671)
+Progress: 59.6% (Trained models for 400 users out of 671)
+Progress: 61.1% (Trained models for 410 users out of 671)
+Progress: 62.6% (Trained models for 420 users out of 671)
+Progress: 64.1% (Trained models for 430 users out of 671)
+Progress: 65.6% (Trained models for 440 users out of 671)
+Progress: 67.1% (Trained models for 450 users out of 671)
+Progress: 68.6% (Trained models for 460 users out of 671)
+Progress: 70.0% (Trained models for 470 users out of 671)
+Progress: 71.5% (Trained models for 480 users out of 671)
+Progress: 73.0% (Trained models for 490 users out of 671)
+Progress: 74.5% (Trained models for 500 users out of 671)
+Progress: 76.0% (Trained models for 510 users out of 671)
+Progress: 77.5% (Trained models for 520 users out of 671)
+Progress: 79.0% (Trained models for 530 users out of 671)
+Progress: 80.5% (Trained models for 540 users out of 671)
+Progress: 82.0% (Trained models for 550 users out of 671)
+Progress: 83.5% (Trained models for 560 users out of 671)
+Progress: 84.9% (Trained models for 570 users out of 671)
+Progress: 86.4% (Trained models for 580 users out of 671)
+Progress: 87.9% (Trained models for 590 users out of 671)
+Progress: 89.4% (Trained models for 600 users out of 671)
+Progress: 90.9% (Trained models for 610 users out of 671)
+Progress: 92.4% (Trained models for 620 users out of 671)
+Progress: 93.9% (Trained models for 630 users out of 671)
+Progress: 95.4% (Trained models for 640 users out of 671)
+Progress: 96.9% (Trained models for 650 users out of 671)
+Progress: 98.4% (Trained models for 660 users out of 671)
+Progress: 99.9% (Trained models for 670 users out of 671)
+SVM training complete! Models trained for 671 users
+Analysis complete.
+Evaluating  Random ...
+Evaluating accuracy...
+Analysis complete.
+
+
+Algorithm  RMSE       MAE       
+PureSVM    0.9870     0.7534    
+Random     1.4385     1.1478    
+
+Legend:
+
+RMSE:      Root Mean Squared Error. Lower values mean better accuracy.
+MAE:       Mean Absolute Error. Lower values mean better accuracy.
+
+Using recommender  PureSVM
+
+Building recommendation model...
+Preparing movie features for SVM training...
+Created feature vectors for 9061 movies
+Training individual SVM models for each user...
+Progress: 1.5% (Trained models for 10 users out of 671)
+Progress: 3.0% (Trained models for 20 users out of 671)
+Progress: 4.5% (Trained models for 30 users out of 671)
+Progress: 6.0% (Trained models for 40 users out of 671)
+Progress: 7.5% (Trained models for 50 users out of 671)
+Progress: 8.9% (Trained models for 60 users out of 671)
+Progress: 10.4% (Trained models for 70 users out of 671)
+Progress: 11.9% (Trained models for 80 users out of 671)
+Progress: 13.4% (Trained models for 90 users out of 671)
+Progress: 14.9% (Trained models for 100 users out of 671)
+Progress: 16.4% (Trained models for 110 users out of 671)
+Progress: 17.9% (Trained models for 120 users out of 671)
+Progress: 19.4% (Trained models for 130 users out of 671)
+Progress: 20.9% (Trained models for 140 users out of 671)
+Progress: 22.4% (Trained models for 150 users out of 671)
+Progress: 23.8% (Trained models for 160 users out of 671)
+Progress: 25.3% (Trained models for 170 users out of 671)
+Progress: 26.8% (Trained models for 180 users out of 671)
+Progress: 28.3% (Trained models for 190 users out of 671)
+Progress: 29.8% (Trained models for 200 users out of 671)
+Progress: 31.3% (Trained models for 210 users out of 671)
+Progress: 32.8% (Trained models for 220 users out of 671)
+Progress: 34.3% (Trained models for 230 users out of 671)
+Progress: 35.8% (Trained models for 240 users out of 671)
+Progress: 37.3% (Trained models for 250 users out of 671)
+Progress: 38.7% (Trained models for 260 users out of 671)
+Progress: 40.2% (Trained models for 270 users out of 671)
+Progress: 41.7% (Trained models for 280 users out of 671)
+Progress: 43.2% (Trained models for 290 users out of 671)
+Progress: 44.7% (Trained models for 300 users out of 671)
+Progress: 46.2% (Trained models for 310 users out of 671)
+Progress: 47.7% (Trained models for 320 users out of 671)
+Progress: 49.2% (Trained models for 330 users out of 671)
+Progress: 50.7% (Trained models for 340 users out of 671)
+Progress: 52.2% (Trained models for 350 users out of 671)
+Progress: 53.7% (Trained models for 360 users out of 671)
+Progress: 55.1% (Trained models for 370 users out of 671)
+Progress: 56.6% (Trained models for 380 users out of 671)
+Progress: 58.1% (Trained models for 390 users out of 671)
+Progress: 59.6% (Trained models for 400 users out of 671)
+Progress: 61.1% (Trained models for 410 users out of 671)
+Progress: 62.6% (Trained models for 420 users out of 671)
+Progress: 64.1% (Trained models for 430 users out of 671)
+Progress: 65.6% (Trained models for 440 users out of 671)
+Progress: 67.1% (Trained models for 450 users out of 671)
+Progress: 68.6% (Trained models for 460 users out of 671)
+Progress: 70.0% (Trained models for 470 users out of 671)
+Progress: 71.5% (Trained models for 480 users out of 671)
+Progress: 73.0% (Trained models for 490 users out of 671)
+Progress: 74.5% (Trained models for 500 users out of 671)
+Progress: 76.0% (Trained models for 510 users out of 671)
+Progress: 77.5% (Trained models for 520 users out of 671)
+Progress: 79.0% (Trained models for 530 users out of 671)
+Progress: 80.5% (Trained models for 540 users out of 671)
+Progress: 82.0% (Trained models for 550 users out of 671)
+Progress: 83.5% (Trained models for 560 users out of 671)
+Progress: 84.9% (Trained models for 570 users out of 671)
+Progress: 86.4% (Trained models for 580 users out of 671)
+Progress: 87.9% (Trained models for 590 users out of 671)
+Progress: 89.4% (Trained models for 600 users out of 671)
+Progress: 90.9% (Trained models for 610 users out of 671)
+Progress: 92.4% (Trained models for 620 users out of 671)
+Progress: 93.9% (Trained models for 630 users out of 671)
+Progress: 95.4% (Trained models for 640 users out of 671)
+Progress: 96.9% (Trained models for 650 users out of 671)
+Progress: 98.4% (Trained models for 660 users out of 671)
+Progress: 99.9% (Trained models for 670 users out of 671)
+SVM training complete! Models trained for 671 users
+Computing recommendations...
+
+We recommend:
+Rubber (2010) 4.633877638699271
+Machete (2010) 4.542563535445199
+After the Sunset (2004) 4.481813131762813
+Charlie's Angels: Full Throttle (2003) 4.471688064482414
+Green Hornet, The (2011) 4.437148436966635
+Sherlock Holmes: A Game of Shadows (2011) 4.4359265838710025
+Red 2 (2013) 4.4055719410323135
+Osmosis Jones (2001) 4.38248426526794
+Wasabi (2001) 4.355476748852684
+Rush Hour 3 (2007) 4.344821537349928
+
+Using recommender  Random
+
+Building recommendation model...
+Computing recommendations...
+
+We recommend:
+Sleepers (1996) 5
+Beavis and Butt-Head Do America (1996) 5
+Fear and Loathing in Las Vegas (1998) 5
+Happiness (1998) 5
+Summer of Sam (1999) 5
+Bowling for Columbine (2002) 5
+Babe (1995) 5
+Birdcage, The (1996) 5
+Carlito's Way (1993) 5
+Wizard of Oz, The (1939) 5
