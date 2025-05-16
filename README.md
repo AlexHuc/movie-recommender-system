@@ -1,5 +1,7 @@
 # Movie Recommendation System
 
+![MovieRecommendationSystem](images/MovieRecommendationSystem.png)
+
 ## Overview
 This project implements a machine learning-based movie recommendation systems using the MovieLens dataset. The system analyzes user preferences and movie features to predict ratings and recommend relevant movies to users. All algorithms are implemented from scratch in pure Python to demonstrate the underlying mathematics and concepts of recommendation systems.
 

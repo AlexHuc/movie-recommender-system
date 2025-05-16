@@ -1,5 +1,7 @@
 # Content-Based Recommendation Algorithms
 
+![ContentBased](../images/ContentBased.png)
+
 This directory contains pure Python implementations of content-based recommendation algorithms. Each algorithm uses movie features such as genres, year of release, and tags to make recommendations, rather than relying solely on user-item interactions.
 
 ## Algorithm Descriptions
