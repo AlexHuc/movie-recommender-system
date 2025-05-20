@@ -26,7 +26,7 @@ import random
 
 class PureKNN:
     """
-    A pure Python implementation of content-based KNN algorithm
+    A pure Python implementation of content-based KNN algorithm with feature vectors
     """
     
     def __init__(self, k=40):
