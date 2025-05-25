@@ -1,0 +1,2710 @@
+\documentclass{beamer}
+% \usetheme{Madrid}
+% \usecolortheme{dolphin}
+\usepackage{amsmath}
+
+\title{ML methods for potential customer prediction}
+\author{Alexandru-Flavius Huc}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\section{Overview of the Project}
+\begin{frame}{Overview of the Project}
+    \begin{itemize}
+        \item Train ML models for recommender systems using explicit movie ratings provided by users.
+        \item Explain each ML models trained
+        \item Evaluate how accurately the algorithm can predict ratings for movies the users have already seen and rated.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{ML methods: Collaborative Filtering}
+    \begin{itemize}
+        \item \textbf{User-Based Collaborative Filtering}
+        \begin{itemize}
+            \item K-Nearest Neighbors with user similarity using:
+            \begin{itemize}
+                \item Cosine similarity
+                \item Pearson correlation
+            \end{itemize}
+        \end{itemize}
+        \item \textbf{Item-Based Collaborative Filtering}
+            \begin{itemize}
+                \item K-Nearest Neighbors with item similarity using:
+                \begin{itemize}
+                    \item Cosine similarity
+                    \item Pearson correlation
+                \end{itemize}            
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{ML methods: Matrix Factorization Techniques}
+    \begin{itemize} 
+        \item Singular Value Decomposition\hspace{0.8cm}(SVD)
+        \item Singular Value Decomposition++\hspace{0.2cm}(SVD++)
+        \item Non-negative Matrix Factorization (NMF)
+        \item Alternating Least Squares\hspace{1.5cm}(ALS)
+        \item Probabilistic Matrix Factorization\hspace{0.25cm}(PMF)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{ML methods: Content-Based Filtering}
+    \begin{itemize}  
+        \item Logistic Regression
+        \item Decision Trees
+        \item Naive Bayes
+        \item Support Vector Machines (SVM)
+        \item K-Nearest Neighbors with feature vectors
+        \item Term Frequency - Inverse Document Frequency + Cosine similarity
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Contents}
+\tableofcontents
+\end{frame}
+
+
+\section{Collaborative Filtering: Introduction}
+\begin{frame}
+\frametitle{Collaborative Filtering: Introduction}
+\begin{itemize}
+    \item \textbf{Recommender Systems}:
+    \begin{itemize}
+        \item \textit{Non-personalized}: Same recommendations for all users
+        \item \textit{Personalized}: Customized to individual user preferences
+    \end{itemize}
+    \vspace{0.3cm}
+    
+    \item \textbf{Collaborative Filtering}:
+    \begin{itemize}
+        \item A personalized recommendation technique
+        \item Uses interaction data from multiple users
+        \item Predicts user ratings
+        \item Does not require content analysis of items
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Types of Collaborative Filtering}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{User-to-User Collaborative Filtering}
+\begin{itemize}
+    \item Based on user similarity
+    \item Core assumption: Similar users like similar items
+    \item Process:
+    \begin{enumerate}
+        \item Find users with similar rating patterns
+        \item Use their ratings to predict missing ratings
+    \end{enumerate}
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Item-to-Item Collaborative Filtering}
+\begin{itemize}
+    \item Based on item similarity
+    \item Core assumption: Users rate similar items similarly
+    \item Process:
+    \begin{enumerate}
+        \item Find items similar to those the user rated
+        \item Predict ratings based on similar items
+    \end{enumerate}
+    \item Useful when user preferences are abstract
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\subsection{User-to-User Collaborative Filtering}
+\begin{frame}
+\frametitle{User-to-User Collaborative Filtering}
+\begin{itemize}
+    \item \textbf{Core Principle}: Users who rated items similarly in the past will rate other items similarly
+    
+    \item \textbf{Implementation Process}:
+    \begin{enumerate}
+        \item Create a user-item rating matrix
+        \item Calculate similarity between target user and all other users
+        \item Identify the most similar users (neighbors)
+        \item Predict ratings using weighted average of neighbor ratings
+    \end{enumerate}
+    
+    \item \textbf{Advantages}:
+    \begin{itemize}
+        \item Intuitive approach
+        \item Works across diverse domains without content analysis
+        \item Can discover unexpected recommendations
+    \end{itemize}
+    
+    \item \textbf{Challenges}:
+    \begin{itemize}
+        \item Computationally expensive with many users
+        \item Cold-start problem for new users
+        \item Sparsity in the rating matrix
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsubsection{PureUserKNN}
+\begin{frame}
+\frametitle{PureUserKNN Class}
+
+\begin{itemize}
+    \item A pure Python implementation of user-based collaborative filtering
+    \item Uses K-Nearest Neighbors approach to predict user ratings for items
+    \item \textbf{Core assumption}: Users with similar taste in the past will have similar preferences in the future
+    \item \textbf{Goal}: Predict unknown ratings based on patterns in existing ratings
+    \item Does not rely on item content features - only uses the rating matrix
+
+    \vspace{1cm}
+    
+    \item \textit{PureUserKNN examines user rating patterns to identify similar users,
+then leverages these similarities to make personalized predictions}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{k}: Number of nearest neighbors to consider
+        \item \textbf{similarity metric}: 'pearson' (default) or 'cosine'
+    \end{itemize}
+    
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item User-user similarity matrix
+        \item User rating dictionaries
+        \item User mean ratings
+        \item Inverted index (item → users who rated it)
+    \end{itemize}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Train the model
+        \item \textbf{predict}: Generate rating predictions
+        \item \textbf{similarity computations}: Calculate user similarity
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the Model}
+
+\begin{enumerate}
+    \item \textbf{Data Organization}
+    \begin{itemize}
+        \item Process input (user, item, rating) tuples
+        \item Organize ratings by user
+        \item Create inverted index for efficient lookups
+        \item Calculate global mean rating
+        \item Calculate per-user mean ratings
+    \end{itemize}
+    
+    \item \textbf{User-User Similarity Matrix Computation}
+    \begin{itemize}
+        \item Create an $n \times n$ matrix where $n$ is the number of users
+        \item For each pair of users $(u,v)$:
+        \begin{itemize}
+            \item Find common items they both rated
+            \item Compute similarity based on these co-rated items
+            \item Store similarity values symmetrically
+        \end{itemize}
+        \item Uses either Pearson correlation or cosine similarity
+    \end{itemize}
+    
+    \item \textbf{Optimization}
+    \begin{itemize}
+        \item Only compute each similarity once: $\text{sim}(u,v) = \text{sim}(v,u)$
+        \item Track progress for large datasets
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Methods: Similarity Computation}
+
+\begin{itemize}
+    \item \textbf{\_compute\_similarity}: Gateway method that selects the appropriate metric
+    \begin{itemize}
+        \item Identifies common items rated by both users
+        \item Ensures at least 2 common items for meaningful similarity
+        \item Delegates to specific similarity implementations
+    \end{itemize}
+    
+    \item \textbf{\_compute\_pearson\_similarity}:
+    \begin{itemize}
+        \item Measures correlation between user rating patterns
+        \item Accounts for different rating scales via mean-centering
+        \item Formula: 
+        \begin{align*}
+        \text{sim}(u,v) &= \frac{\sum_{i \in I_{uv}}(r_{ui}-\bar{r}_u)(r_{vi}-\bar{r}_v)}{\sqrt{\sum_{i \in I_{uv}}(r_{ui}-\bar{r}_u)^2 \sum_{i \in I_{uv}}(r_{vi}-\bar{r}_v)^2}}
+        \end{align*}
+    \end{itemize}
+    
+    \item \textbf{\_compute\_cosine\_similarity}:
+    \begin{itemize}
+        \item Measures angle between user rating vectors
+        \item Simpler but doesn't adjust for rating scale differences
+        \item Formula: 
+        \begin{align*}
+        \text{sim}(u,v) &= \frac{\sum_{i \in I_{uv}}r_{ui}r_{vi}}{\sqrt{\sum_{i \in I_{uv}}r_{ui}^2 \sum_{i \in I_{uv}}r_{vi}^2}}
+        \end{align*}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction}
+
+\begin{enumerate}
+    \item \textbf{Initial Checks}
+    \begin{itemize}
+        \item Verify user exists in training data
+        \item Check if user has already rated this item
+    \end{itemize}
+    
+    \item \textbf{Neighbor Selection}
+    \begin{itemize}
+        \item Find users who have rated the target item
+        \item Calculate similarity between target user and these users
+        \item Filter to include only positively correlated users
+        \item Select top-k most similar users (neighbors)
+    \end{itemize}
+    
+    \item \textbf{Rating Calculation}
+    \begin{itemize}
+        \item Use weighted average based on similarity scores
+        \item Apply mean-centering to normalize different user rating scales
+        \item Formula: $\hat{r}_{ui} = \bar{r}_u + \frac{\sum_{v \in N} \text{sim}(u,v) \cdot (r_{vi} - \bar{r}_v)}{\sum_{v \in N} \text{sim}(u,v)}$
+        \item Clip final prediction to valid rating range (1-5)
+    \end{itemize}
+    
+    \item \textbf{Fallback Strategies}
+    \begin{itemize}
+        \item Return user's mean rating if no neighbors found
+        \item Return global mean for unknown users
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\subsection{Item-to-Item Collaborative Filtering}
+\begin{frame}
+\frametitle{Item-to-Item Collaborative Filtering}
+\begin{itemize}
+    \item \textbf{Core Principle}: Similar items tend to receive similar ratings from the same user
+    
+    \item \textbf{Implementation Process}:
+    \begin{enumerate}
+        \item Create a user-item rating matrix
+        \item Calculate similarity between items based on co-ratings
+        \item Identify the most similar items to those the user has rated (neighbors)
+        \item Predict ratings using weighted average of ratings given to similar items
+    \end{enumerate}
+    
+    \item \textbf{Advantages}:
+    \begin{itemize}
+        \item More scalable than user-based approach
+        \item More stable (item relationships change less frequently)
+        \item Better performance with sparse data
+        \item Can be pre-computed offline
+    \end{itemize}
+    
+    \item \textbf{Challenges}:
+    \begin{itemize}
+        \item Cold-start problem for new items
+        \item Limited to recommending similar items (less diversity)
+        \item Requires sufficient co-ratings for accurate similarity
+        \item May struggle with niche user preferences
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsubsection{PureItemKNN}
+\begin{frame}
+\frametitle{What is PureItemKNN?}
+
+\begin{itemize}
+    \item A pure Python implementation of item-based collaborative filtering
+    \item Uses K-Nearest Neighbors approach to predict ratings based on item similarities
+    \item Core assumption: Similar items will receive similar ratings from the same user
+    \item Goal: Predict how a user would rate an item based on their ratings of similar items
+    \item Does not require user demographic information - only analyzes the rating matrix
+
+    \vspace{1cm}
+
+    \item \textit{PureItemKNN examines patterns in how items are rated across users,
+then leverages item similarities to make personalized predictions}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{k}: Number of nearest neighbor items to consider
+        \item \textbf{similarity metric}: 'pearson' (default) or 'cosine'
+    \end{itemize}
+    
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item Item-item similarity matrix
+        \item Item rating dictionaries
+        \item Item mean ratings
+        \item ID mapping dictionaries
+    \end{itemize}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Train the model
+        \item \textbf{predict}: Generate rating predictions
+        \item \textbf{similarity computations}: Calculate item similarity
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the Model}
+
+\begin{enumerate}
+    \item \textbf{Data Organization}
+    \begin{itemize}
+        \item Process input (user, item, rating) tuples
+        \item Organize ratings by item rather than by user
+        \item Create item ID mappings for matrix operations
+        \item Calculate global mean rating
+        \item Calculate per-item mean ratings
+    \end{itemize}
+    
+    \item \textbf{Item-Item Similarity Matrix Computation}
+    \begin{itemize}
+        \item Create an $m \times m$ matrix where $m$ is the number of items
+        \item For each pair of items $(i,j)$:
+        \begin{itemize}
+            \item Find common users who rated both items
+            \item Compute similarity based on these co-ratings
+            \item Store similarity values symmetrically
+        \end{itemize}
+        \item Uses either Pearson correlation or cosine similarity
+    \end{itemize}
+    
+    \item \textbf{Optimization}
+    \begin{itemize}
+        \item Only compute each similarity once: $\text{sim}(i,j) = \text{sim}(j,i)$
+        \item Track progress during computation (especially important for large item catalogs)
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Methods: Similarity Computation}
+
+\begin{itemize}
+    \item \textbf{\_compute\_similarity}: Gateway method that selects the appropriate metric
+    \begin{itemize}
+        \item Identifies common users who rated both items
+        \item Ensures at least 2 common users for meaningful similarity
+        \item Delegates to specific similarity implementations
+    \end{itemize}
+    
+    \item \textbf{\_compute\_pearson\_similarity}:
+    \begin{itemize}
+        \item Measures correlation between item rating patterns
+        \item Accounts for different item popularity via mean-centering
+        \item Formula: 
+        \begin{align*}
+        \text{sim}(i,j) &= \frac{\sum_{u \in U_{ij}}(r_{ui}-\bar{r}_i)(r_{uj}-\bar{r}_j)}{\sqrt{\sum_{u \in U_{ij}}(r_{ui}-\bar{r}_i)^2 \sum_{u \in U_{ij}}(r_{uj}-\bar{r}_j)^2}}
+        \end{align*}
+    \end{itemize}
+    
+    \item \textbf{\_compute\_cosine\_similarity}:
+    \begin{itemize}
+        \item Measures angle between item rating vectors
+        \item Simpler but doesn't adjust for item popularity differences
+        \item Formula: 
+        \begin{align*}
+        \text{sim}(i,j) &= \frac{\sum_{u \in U_{ij}}r_{ui}r_{uj}}{\sqrt{\sum_{u \in U_{ij}}r_{ui}^2 \sum_{u \in U_{ij}}r_{uj}^2}}
+        \end{align*}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction}
+
+\begin{enumerate}
+    \item \textbf{Initial Checks}
+    \begin{itemize}
+        \item Verify target item exists in training data
+        \item Retrieve item index for similarity lookup
+    \end{itemize}
+    
+    \item \textbf{Neighbor Selection}
+    \begin{itemize}
+        \item Find items the target user has already rated
+        \item Calculate similarity between target item and these items
+        \item Filter to include only positively correlated items
+        \item Select top-k most similar items (neighbors)
+    \end{itemize}
+    
+    \item \textbf{Rating Calculation}
+    \begin{itemize}
+        \item Use weighted average based on similarity scores
+        \item Apply mean-centering to normalize different item popularity
+        \item Formula: $\hat{r}_{ui} = \bar{r}_i + \frac{\sum_{j \in N} \text{sim}(i,j) \cdot (r_{uj} - \bar{r}_j)}{\sum_{j \in N} \text{sim}(i,j)}$
+        \item Clip final prediction to valid rating range (1-5)
+    \end{itemize}
+    
+    \item \textbf{Fallback Strategies}
+    \begin{itemize}
+        \item Return item's mean rating if no similar items found
+        \item Return null for unknown items (handled by adapter class)
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\section{Matrix Factorization: Introduction}
+\begin{frame}
+\frametitle{Matrix Factorization: Introduction}
+    \begin{itemize}
+        \item A technique to break down a large user-item rating matrix into smaller matrices
+        \item Core idea: Represent both users and items in a lower-dimensional "latent factor" space
+        \item These latent factors capture underlying patterns in user preferences
+        \item Popular in recommender systems for its accuracy and 
+        scalability
+
+        \vspace{1cm}
+        
+        \item \textit{"Matrix factorization models map both users and items to a joint latent factor space, such that user-item interactions are modeled as inner products in that space."}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Matrix Factorization: Formula}
+
+\begin{center}
+\Large
+$R \approx P \times Q^T$
+\end{center}
+
+\vspace{0.5cm}
+Where:
+\begin{itemize}
+    \item $R$ is the original user-item rating matrix (users × items)
+    \item $P$ is the user factors matrix (users × factors)
+    \item $Q$ is the item factors matrix (items × factors)
+    \item $k$ is the number of latent factors (typically 10-100)
+\end{itemize}
+
+\begin{center}
+\setlength{\unitlength}{0.1\textwidth}
+\begin{picture}(10,3)
+    % Rating matrix
+    \put(0.5,0.5){\framebox(2.5,2){$R_{n \times m}$}}
+    
+    % Approx equals
+    \put(3.5,1.5){$\approx$}
+    
+    % P matrix
+    \put(4.5,0.5){\framebox(1.5,2){$P_{n \times k}$}}
+    
+    % Multiplication
+    \put(6.5,1.5){$\times$}
+    
+    % Q^T matrix
+    \put(7.5,0.5){\framebox(2.5,1.5){$Q^T_{k \times m}$}}
+\end{picture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Matrix Factorization: Making Predictions}
+
+\textbf{Basic Prediction Formula:}
+\begin{center}
+\Large
+$\hat{r}_{ui} = p_u^T q_i = \sum_{f=1}^k p_{uf} \cdot q_{if}$
+\end{center}
+
+\vspace{0.3cm}
+Where:
+\begin{itemize}
+    \item $\hat{r}_{ui}$ is the predicted rating of user $u$ for item $i$
+    \item $p_u$ is the latent factor vector for user $u$ (row of $P$)
+    \item $q_i$ is the latent factor vector for item $i$ (row of $Q$)
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Enhanced Model with Biases:}
+\begin{center}
+$\hat{r}_{ui} = \mu + b_u + b_i + p_u^T q_i$
+\end{center}
+
+Adding:
+\begin{itemize}
+    \item $\mu$: Global average rating
+    \item $b_u$: User bias (how much user $u$ tends to give higher/lower ratings)
+    \item $b_i$: Item bias (how much item $i$ tends to receive higher/lower ratings)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Matrix Factorization: Learning Process}
+
+\textbf{Optimization Objective:}
+\begin{center}
+$\min_{P,Q,b} \sum_{(u,i) \in K} (r_{ui} - \hat{r}_{ui})^2 + \lambda(||P||^2 + ||Q||^2 + ||b||^2)$
+\end{center}
+
+\vspace{0.3cm}
+\textbf{Common Solution Approaches:}
+\begin{itemize}
+    \item \textbf{Stochastic Gradient Descent (SGD)}:
+    \begin{itemize}
+        \item Iteratively update factors based on prediction errors
+        \item Simple to implement, works well with large datasets
+    \end{itemize}
+    
+    \item \textbf{Alternating Least Squares (ALS)}:
+    \begin{itemize}
+        \item Fix one factor matrix and solve for the other, then alternate
+        \item Easily parallelizable
+    \end{itemize}
+    
+    \item \textbf{Probabilistic Methods}:
+    \begin{itemize}
+        \item Treat factorization as a probabilistic model
+        \item Better handles uncertainty in sparse data
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.2cm}
+The term $\lambda(||P||^2 + ||Q||^2 + ||b||^2)$ is regularization to prevent overfitting
+\end{frame}
+
+\subsection{PureSVD}
+\begin{frame}
+\frametitle{What is PureSVD?}
+
+\begin{itemize}
+    \item A pure Python implementation of Singular Value Decomposition for matrix factorization
+    \item Uses stochastic gradient descent (SGD) to learn latent factors
+    \item Core assumption: User preferences and item attributes can be represented in a shared low-dimensional latent space
+    \item Goal: Decompose the user-item rating matrix into user and item factor matrices
+    \item Includes biases to account for user and item rating tendencies
+
+    \vspace{1cm}
+
+    \item \textit{PureSVD learns compact representations of users and items in a latent factor space, allowing it to capture complex preference patterns and make accurate predictions}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{n\_factors}: Number of latent factors (default=100)
+        \item \textbf{n\_epochs}: Number of iterations for SGD (default=20)
+        \item \textbf{lr}: Learning rate for gradient descent (default=0.005)
+        \item \textbf{reg}: Regularization term to prevent overfitting (default=0.02)
+    \end{itemize}
+    
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item User factors matrix (users × factors)
+        \item Item factors matrix (items × factors)
+        \item User biases dictionary
+        \item Item biases dictionary
+        \item Global mean rating
+        \item ID mapping dictionaries
+    \end{itemize}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Train the model using SGD
+        \item \textbf{predict}: Generate rating predictions
+        \item \textbf{get\_user\_factors/get\_item\_factors}: Access latent factors
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the Model}
+
+\begin{enumerate}
+    \item \textbf{Data Organization}
+    \begin{itemize}
+        \item Process input (user, item, rating) tuples
+        \item Create ID mappings for users and items
+        \item Calculate global mean rating
+    \end{itemize}
+    
+    \item \textbf{Parameter Initialization}
+    \begin{itemize}
+        \item Initialize user and item factor matrices with small random values
+        \item Initialize user and item biases to zero
+    \end{itemize}
+    
+    \item \textbf{SGD Training Process}
+    \begin{itemize}
+        \item For each epoch:
+        \begin{itemize}
+            \item Shuffle the data for better convergence
+            \item For each rating:
+            % \begin{itemize}
+                \item Compute prediction error: $error = r_{ui} - \hat{r}_{ui}$
+                \item Update user and item biases
+                \item Update user and item factors
+            % \end{itemize}
+            \item Track RMSE progress
+            \item Reduce learning rate over time (adaptive learning)
+        \end{itemize}
+    \end{itemize}
+    
+    \item \textbf{Regularization}
+    \begin{itemize}
+        \item Apply regularization to biases and factors to prevent overfitting
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction}
+
+\begin{enumerate}
+    \item \textbf{Initial Checks}
+    \begin{itemize}
+        \item Verify user and item exist in training data
+        \item Return global mean for cold-start cases (new users or items)
+    \end{itemize}
+    
+    \item \textbf{Rating Calculation}
+    \begin{itemize}
+        \item Retrieve user and item indices
+        \item Compute prediction using the learned model:
+        \begin{align*}
+        \hat{r}_{ui} = \mu + b_u + b_i + p_u^T q_i
+        \end{align*}
+        where:
+        \begin{itemize}
+            \item $\mu$ is the global mean rating
+            \item $b_u$ is the user bias
+            \item $b_i$ is the item bias
+            \item $p_u$ is the user factor vector
+            \item $q_i$ is the item factor vector
+        \end{itemize}
+        \item Clip prediction to valid rating range (1-5)
+    \end{itemize}
+    
+    \item \textbf{Additional Methods}
+    \begin{itemize}
+        \item \textbf{get\_user\_factors}: Retrieve latent factors for a specific user
+        \item \textbf{get\_item\_factors}: Retrieve latent factors for a specific item
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: SVD with SGD}
+
+\textbf{SVD Principles}
+\begin{itemize}
+    \item Matrix factorization technique
+    \item Reduces dimensionality while preserving structure
+    \item Learns latent factors representing underlying patterns
+    \item Models both user preferences and item characteristics
+\end{itemize}
+
+\textbf{Model Formulation}
+\begin{itemize}
+    \item Predicts rating as:
+    \begin{align*}
+    \hat{r}_{ui} = \mu + b_u + b_i + p_u^T q_i
+    \end{align*}
+    \item Minimizes squared error:
+    \begin{align*}
+    \min_{p,q,b} \sum_{(u,i)} (r_{ui} - \hat{r}_{ui})^2 + \lambda(||p||^2 + ||q||^2 + ||b||^2)
+    \end{align*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: SVD with SGD}
+\textbf{Training Process (SGD)}
+\begin{enumerate}
+    \item Initialize model parameters
+    \item For each epoch:
+    \begin{itemize}
+        \item Shuffle training data
+        \item For each rating $(u,i,r_{ui})$:
+        \begin{itemize}
+            \item Compute error: $e_{ui} = r_{ui} - \hat{r}_{ui}$
+            \item Update biases:
+            \begin{align*}
+            b_u &\leftarrow b_u + \gamma(e_{ui} - \lambda b_u)\\
+            b_i &\leftarrow b_i + \gamma(e_{ui} - \lambda b_i)
+            \end{align*}
+            \item Update factors:
+            \begin{align*}
+            p_u &\leftarrow p_u + \gamma(e_{ui}q_i - \lambda p_u)\\
+            q_i &\leftarrow q_i + \gamma(e_{ui}p_u - \lambda q_i)
+            \end{align*}
+        \end{itemize}
+        \item Reduce learning rate $\gamma$
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\subsection{PureSVDpp}
+\begin{frame}
+\frametitle{What is PureSVDpp?}
+
+\begin{itemize}
+    \item A pure Python implementation of SVD++ (SVD Plus Plus), an enhanced matrix factorization algorithm
+    \item Extends standard SVD by incorporating implicit feedback (which items users have rated)
+    \item Core innovation: Creates a richer user representation using both explicit and implicit feedback
+    \item Goal: Improve prediction accuracy by considering not just rating values but also rating patterns
+    \item Includes both explicit preferences (ratings) and implicit preferences (interactions)
+
+    \vspace{1cm}
+
+    \item \textit{PureSVDpp enhances user representation by combining explicit ratings with implicit feedback signals, leading to more nuanced and accurate predictions}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{n\_factors}: Number of latent factors (default=100)
+        \item \textbf{n\_epochs}: Number of iterations for SGD (default=20)
+        \item \textbf{lr}: Learning rate for gradient descent (default=0.005)
+        \item \textbf{reg}: Regularization term to prevent overfitting (default=0.02)
+        \item \textbf{implicit\_weight}: Weight for implicit feedback influence (default=0.1)
+    \end{itemize}
+    
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item User factors matrix (users × factors)
+        \item Item factors matrix (items × factors)
+        \item Item implicit factors matrix (items × factors) - unique to SVD++
+        \item User and item biases dictionaries
+        \item User-rated items mapping (for implicit feedback)
+        \item Normalized user rating counts (for proper weighting)
+    \end{itemize}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Train the model using enhanced SGD
+        \item \textbf{predict}: Generate rating predictions with implicit components
+        \item \textbf{get\_user\_factors}: Access combined explicit and implicit factors
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the Enhanced Model}
+    \textbf{1. Standard Data Processing}
+    \begin{itemize}
+        \item Process input (user, item, rating) tuples
+        \item Create ID mappings for users and items
+        \item Calculate global mean rating
+    \end{itemize}
+
+    \vspace{1cm}
+    
+    \textbf{2. Implicit Feedback Processing}
+    \begin{itemize}
+        \item Build user-item interaction data (which items each user has rated)
+        \item Pre-calculate normalization factors: $\frac{1}{\sqrt{|I_u|}}$ for each user
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the Enhanced Model}    
+    \textbf{3. Parameter Initialization}
+    \begin{itemize}
+        \item Initialize user factors, item factors with small random values
+        \item Initialize item implicit factors (new in SVD++)
+        \item Initialize user and item biases to zero
+    \end{itemize}
+
+    \vspace{1cm}
+    
+    \textbf{4. Enhanced SGD Training Process}
+    \begin{itemize}
+        \item For each epoch:
+        \begin{itemize}
+            \item Shuffle the data for better convergence
+            \item For each rating:
+            \begin{itemize}
+                \item Compute implicit feedback sum for the user
+                \item Make prediction with implicit component
+                \item Update biases and explicit factors
+                \item Update implicit item factors for all items user has rated
+            \end{itemize}
+            \item Track RMSE progress
+            \item Reduce learning rate over time
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Enhanced Rating Prediction}
+    \textbf{1. Initial Checks}
+    \begin{itemize}
+        \item Verify user and item exist in training data
+        \item Return global mean for cold-start cases
+    \end{itemize}
+    
+    \textbf{2. Implicit Feedback Calculation}
+    \begin{itemize}
+        \item Calculate sum of implicit item factors for all items the user has rated
+        \item Normalize by $\frac{1}{\sqrt{|I_u|}}$ (where $|I_u|$ is the number of items rated by user $u$)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Enhanced Rating Prediction}
+    \textbf{3. Enhanced Rating Calculation}
+    \begin{itemize}
+        \item Compute prediction using the enhanced model:
+        \begin{align*}
+        \hat{r}_{ui} = \mu + b_u + b_i + q_i^T \left(p_u + w \cdot \frac{1}{\sqrt{|I_u|}} \sum_{j \in I_u} y_j\right)
+        \end{align*}
+        where:
+        \begin{itemize}
+            \item $\mu$ is the global mean rating
+            \item $b_u$ is the user bias
+            \item $b_i$ is the item bias
+            \item $p_u$ is the explicit user factor vector
+            \item $q_i$ is the item factor vector
+            \item $y_j$ are the implicit item factors
+            \item $w$ is the implicit weight parameter
+            \item $I_u$ is the set of items rated by user $u$
+        \end{itemize}
+        \item Clip prediction to valid rating range (1-5)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: SVD++ with SGD}
+% \textbf{SVD++ Principles}
+\begin{itemize}
+    \item Extension of standard matrix factorization
+    \item Enhances user representation with implicit feedback
+    \item Models both explicit preferences (what users rate) and implicit preferences (which items users rate)
+    \item Captures more nuanced patterns in user behavior
+% \end{itemize}
+
+% \textbf{Enhanced Model Formulation}
+% \begin{itemize}
+    \item Predicts rating with implicit feedback component:
+    \begin{align*}
+    \hat{r}_{ui} = \mu + b_u + b_i + q_i^T \left(p_u + w \cdot \frac{1}{\sqrt{|I_u|}} \sum_{j \in I_u} y_j\right)
+    \end{align*}
+    \item Minimizes squared error with additional regularization:
+    \begin{align*}
+    \min_{p,q,y,b} \sum_{(u,i)} (r_{ui} - \hat{r}_{ui})^2 + \lambda(||p||^2 + ||q||^2 + ||y||^2 + ||b||^2)
+    \end{align*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Training Process: SVD++ with SGD}
+\begin{enumerate}
+    \item Initialize model parameters including implicit item factors
+    \item For each epoch:
+    \begin{itemize}
+        \item Shuffle training data
+        \item For each rating $(u,i,r_{ui})$:
+        \begin{itemize}
+            \item Compute implicit factor sum: $impl_u = \frac{w}{\sqrt{|I_u|}} \sum_{j \in I_u} y_j$
+            \item Predict: $\hat{r}_{ui} = \mu + b_u + b_i + q_i^T(p_u + impl_u)$
+            \item Compute error: $e_{ui} = r_{ui} - \hat{r}_{ui}$
+            \item Update biases:
+            \begin{align*}
+            b_u &\leftarrow b_u + \gamma(e_{ui} - \lambda b_u)\\
+            b_i &\leftarrow b_i + \gamma(e_{ui} - \lambda b_i)
+            \end{align*}
+            \item Update explicit factors:
+            \begin{align*}
+            p_u &\leftarrow p_u + \gamma(e_{ui}q_i - \lambda p_u)\\
+            q_i &\leftarrow q_i + \gamma(e_{ui}(p_u + impl_u) - \lambda q_i)
+            \end{align*}
+            \item Update implicit factors for all $j \in I_u$:
+            \begin{align*}
+            y_j &\leftarrow y_j + \gamma(e_{ui} \cdot \frac{w}{\sqrt{|I_u|}} \cdot q_i - \lambda y_j)
+            \end{align*}
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\subsection{PureNMF}
+\begin{frame}
+\frametitle{What is PureNMF?}
+
+\begin{itemize}
+    \item A pure Python implementation of Non-negative Matrix Factorization (NMF)
+    \item Matrix factorization technique with the constraint that all factors must be non-negative
+    \item Core principle: Decompose rating matrix $R$ into non-negative matrices $P$ and $Q$ where $R \approx P \cdot Q^T$
+    \item Goal: Learn interpretable, parts-based representations of users and items
+    \item Enforces non-negativity to create more meaningful latent factors
+
+    \vspace{1cm}
+
+    \item \textit{PureNMF generates additive, parts-based representations where latent factors can be interpreted as features or topics, leading to more intuitive recommendation explanations}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{n\_factors}: Number of latent factors (default=15)
+        \item \textbf{n\_epochs}: Number of iterations for SGD (default=50)
+        \item \textbf{lr}: Learning rate for gradient descent (default=0.01)
+        \item \textbf{reg}: Regularization term to prevent overfitting (default=0.02)
+        \item \textbf{beta}: Special parameter for non-negativity constraint (default=0.02)
+    \end{itemize}
+    
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item User factors matrix - non-negative (users × factors)
+        \item Item factors matrix - non-negative (items × factors)
+        \item Normalization parameters (min rating and rating range)
+        \item ID mapping dictionaries
+        \item Global mean rating
+    \end{itemize}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Train the model using constrained SGD
+        \item \textbf{predict}: Generate rating predictions
+        \item \textbf{get\_user\_factors/get\_item\_factors}: Access learned factors
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the NMF Model}
+
+    \textbf{1. Data Processing}
+    \begin{itemize}
+        \item Process input (user, item, rating) tuples
+        \item Create ID mappings for users and items
+        \item Calculate global mean rating
+    \end{itemize}
+
+    \vspace{1cm}
+    
+    \textbf{2. Rating Normalization (NMF-specific)}
+    \begin{itemize}
+        \item Scale ratings to [0,1] range for better NMF performance
+        \item Store scaling parameters for later denormalization
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the NMF Model}
+    \textbf{3. Parameter Initialization}
+    \begin{itemize}
+        \item Initialize user and item factors with small positive random values (0.01-0.1)
+        \item Starting with positive values ensures non-negativity constraints are satisfied
+    \end{itemize}
+    
+    \textbf{4. Constrained SGD Training Process}
+    \begin{itemize}
+        \item For each epoch:
+        \begin{itemize}
+            \item Shuffle the data for better convergence
+            \item For each rating:
+            \begin{itemize}
+                \item Make dot product prediction
+                \item Calculate error on normalized scale
+                \item Update user and item factors with special non-negativity constraints
+            \end{itemize}
+            \item Track RMSE progress
+            \item Reduce learning rate over time (adaptive learning)
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction}
+
+\begin{enumerate}
+    \item \textbf{Initial Checks}
+    \begin{itemize}
+        \item Verify user and item exist in training data
+        \item Return global mean for cold-start cases
+    \end{itemize}
+    
+    \item \textbf{Normalized Prediction}
+    \begin{itemize}
+        \item Retrieve user and item latent factors
+        \item Compute dot product between factors: $\text{norm\_pred} = p_u^T q_i$
+        \item Clip normalized prediction to [0,1] range
+    \end{itemize}
+    
+    \item \textbf{Denormalization}
+    \begin{itemize}
+        \item Convert from normalized [0,1] scale back to original rating scale:
+        \begin{align*}
+        \text{prediction} = \text{norm\_pred} \times \text{rating\_range} + \text{min\_rating}
+        \end{align*}
+        \item Clip final prediction to valid rating range (1-5)
+    \end{itemize}
+    
+    \item \textbf{Additional Methods}
+    \begin{itemize}
+        \item \textbf{get\_user\_factors}: Access latent factors for a specific user
+        \item \textbf{get\_item\_factors}: Access latent factors for a specific item
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: Non-negative Matrix Factorization}
+
+\textbf{NMF Principles}
+\begin{itemize}
+    \item Matrix factorization technique where all elements must be non-negative
+    \item Learns additive components rather than arbitrary features
+    \item Results in more interpretable latent factors
+    \item Each factor can be viewed as a feature or topic
+    \item Creates parts-based representations (vs. holistic representations in SVD)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: Non-negative Matrix Factorization}
+\textbf{Model Formulation}
+\begin{itemize}
+    \item Factors user-item matrix into non-negative components:
+    \begin{align*}
+    R \approx P \times Q^T \quad \text{subject to } P, Q \geq 0
+    \end{align*}
+    \item Optimization objective:
+    \begin{align*}
+    \min_{P,Q \geq 0} \sum_{(u,i)} (r_{ui} - p_u^T q_i)^2 + \lambda(||P||^2 + ||Q||^2)
+    \end{align*}
+    \item Non-negativity constraint adds interpretability but complicates optimization
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Training Process: NMF with Constrained SGD}
+\textbf{Training Process Steps}
+\begin{enumerate}
+    \item Initialize factors with small positive random values (0.01-0.1)
+    \item For each epoch:
+    \begin{itemize}
+        \item Shuffle training data
+        \item For each rating $(u,i,r_{ui})$:
+        \begin{itemize}
+            \item Calculate normalized prediction: $\hat{r}_{ui} = p_u^T q_i$
+            \item Compute error: $e_{ui} = r_{ui} - \hat{r}_{ui}$
+            \item Update user factors with non-negativity constraint:
+            \begin{align*}
+            p_u^{(f)} &\leftarrow p_u^{(f)} + \gamma(e_{ui}q_i^{(f)} - \lambda p_u^{(f)})\\
+            \text{If }p_u^{(f)} &< 0, \text{ then apply soft constraint with } \beta\\
+            p_u^{(f)} &\leftarrow \max(0, p_u^{(f)}) \text{ (hard constraint)}
+            \end{align*}
+            \item Update item factors with non-negativity constraint:
+            \begin{align*}
+            q_i^{(f)} &\leftarrow q_i^{(f)} + \gamma(e_{ui}p_u^{(f)} - \lambda q_i^{(f)})\\
+            \text{If }q_i^{(f)} &< 0, \text{ then apply soft constraint with } \beta\\
+            q_i^{(f)} &\leftarrow \max(0, q_i^{(f)}) \text{ (hard constraint)}
+            \end{align*}
+        \end{itemize}
+        \item Reduce learning rate: $\gamma \leftarrow 0.95 \times \gamma$
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\subsection{PureALS}
+\begin{frame}
+\frametitle{What is PureALS?}
+
+\begin{itemize}
+    \item A pure Python implementation of Alternating Least Squares (ALS) for matrix factorization
+    \item Matrix factorization technique that alternates between solving for user factors and item factors
+    \item Core principle: Decompose rating matrix $R$ into matrices $P$ and $Q$ where $R \approx P \cdot Q^T$
+    \item Goal: Learn latent factors that best explain observed ratings while handling implicit feedback
+    \item Particularly effective for implicit feedback datasets and systems with sparse ratings
+
+    \vspace{1cm}
+
+    \item \textit{PureALS provides an efficient approach to matrix factorization by alternately solving for one set of parameters while keeping the other fixed, enabling easier parallelization and faster convergence}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{n\_factors}: Number of latent factors (default=20)
+        \item \textbf{n\_epochs}: Number of iterations for ALS (default=15)
+        \item \textbf{reg}: Regularization term to prevent overfitting (default=0.1)
+        \item \textbf{confidence\_scaling}: Scaling factor for implicit confidence values (default=40)
+    \end{itemize}
+    
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item User factors matrix (users × factors)
+        \item Item factors matrix (items × factors)
+        \item User-item mappings with confidence values
+        \item Item-user mappings with confidence values
+        \item Rating normalization parameters
+        \item ID mapping dictionaries
+    \end{itemize}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Train the model using alternating least squares
+        \item \textbf{predict}: Generate rating predictions
+        \item \textbf{\_compute\_rmse}: Evaluate model performance during training
+        \item \textbf{get\_user\_factors/get\_item\_factors}: Access learned factors
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the ALS Model}
+
+    \textbf{1. Data Processing}
+    \begin{itemize}
+        \item Process input (user, item, rating) tuples
+        \item Create ID mappings for users and items
+        \item Calculate global mean rating
+    \end{itemize}
+
+    \vspace{0.5cm}
+    
+    \textbf{2. Parameter Initialization}
+    \begin{itemize}
+        \item Initialize user and item factors with small random values
+        \item Build optimized user-item and item-user mappings for efficient updates
+    \end{itemize}
+
+    \vspace{0.5cm}
+    
+    \textbf{3. Confidence Calculation}
+    \begin{itemize}
+        \item Normalize ratings to [0, 1] range
+        \item Convert ratings to confidence values: $c_{ui} = 1 + \alpha \cdot r_{ui}$ 
+        \item Higher ratings result in higher confidence values
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - The Alternating Least Squares Process}
+    \textbf{ALS Training Process}
+    \\ For each epoch:
+    \begin{itemize}
+        \item \textbf{Step 1}: Fix item factors, solve for each user factor
+        \begin{itemize}
+            \item For each user $u$:
+            \begin{itemize}
+                \item Build the system $(Y^T C_u Y + \lambda I) \cdot x_u = Y^T C_u p(u)$
+                \item Solve for user factor vector $x_u$ using linear algebra
+            \end{itemize}
+        \end{itemize}
+        \item \textbf{Step 2}: Fix user factors, solve for each item factor
+        \begin{itemize}
+            \item For each item $i$:
+            \begin{itemize}
+                \item Build the system $(X^T C_i X + \lambda I) \cdot y_i = X^T C_i p(i)$
+                \item Solve for item factor vector $y_i$ using linear algebra
+            \end{itemize}
+        \end{itemize}
+        \item Calculate and report RMSE on training data periodically
+    \end{itemize}
+    
+    \textbf{Key insight}: Each step has a closed-form solution that can be computed directly, avoiding the need for gradient-based optimization
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction}
+
+\begin{enumerate}
+    \item \textbf{Initial Checks}
+    \begin{itemize}
+        \item Verify user and item exist in training data
+        \item Return global mean for cold-start cases
+    \end{itemize}
+    
+    \item \textbf{Raw Prediction Calculation}
+    \begin{itemize}
+        \item Retrieve user and item latent factors
+        \item Compute dot product between factors: $\text{prediction} = p_u^T q_i$
+    \end{itemize}
+    
+    \item \textbf{Confidence to Rating Conversion}
+    \begin{itemize}
+        \item Convert from confidence space back to normalized rating:
+        \begin{align*}
+        \text{scaled\_prediction} = \frac{\text{prediction} - 1.0}{\text{confidence\_scaling}}
+        \end{align*}
+        \item Then convert to original rating scale:
+        \begin{align*}
+        \text{final\_prediction} = \text{scaled\_prediction} \times \text{rating\_range} + \text{min\_rating}
+        \end{align*}
+        \item Clip prediction to valid rating range (typically 1-5)
+    \end{itemize}
+    
+    \item \textbf{Helper Methods}
+    \begin{itemize}
+        \item \textbf{get\_user\_factors}: Access latent factors for a specific user
+        \item \textbf{get\_item\_factors}: Access latent factors for a specific item
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: Alternating Least Squares}
+
+\textbf{ALS Core Principles}
+\begin{itemize}
+    \item Matrix factorization technique that alternates between optimizing two sets of parameters
+    \item Well-suited for implicit feedback data (views, clicks, purchases)
+    \item Can be highly parallelized (each user/item update is independent)
+    \item Directly solves for optimal factors given current estimates of the other factors
+    \item Converges more quickly than SGD for certain problems
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: Alternating Least Squares}
+\textbf{Model Formulation}
+\begin{itemize}
+    \item With confidence values for implicit feedback:
+    \begin{align*}
+    \min_{X,Y} \sum_{(u,i)} c_{ui}(r_{ui} - x_u^T y_i)^2 + \lambda(||X||^2 + ||Y||^2)
+    \end{align*}
+    where:
+    \begin{itemize}
+        \item $c_{ui}$ is the confidence for user $u$'s preference for item $i$
+        \item $r_{ui}$ is the observed rating (or binary interaction)
+        \item $x_u$ and $y_i$ are user and item factors
+        \item $\lambda$ is the regularization parameter
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Training Process: The ALS Algorithm}
+\textbf{Alternating Optimization Steps}
+\begin{enumerate}
+    \item Initialize factor matrices with small random values
+    \item For each epoch:
+    \begin{itemize}
+        \item \textbf{Fix Y, solve for each row of X}:
+        \begin{align*}
+        x_u &= (Y^T C_u Y + \lambda I)^{-1} Y^T C_u p(u)
+        \end{align*}
+        where:
+        \begin{itemize}
+            \item $Y$ is the item factor matrix
+            \item $C_u$ is a diagonal matrix with confidence values for user $u$
+            \item $p(u)$ is the vector of user $u$'s preferences
+            \item $I$ is the identity matrix
+        \end{itemize}
+        
+        \item \textbf{Fix X, solve for each row of Y}:
+        \begin{align*}
+        y_i &= (X^T C_i X + \lambda I)^{-1} X^T C_i p(i)
+        \end{align*}
+        where:
+        \begin{itemize}
+            \item $X$ is the user factor matrix
+            \item $C_i$ is a diagonal matrix with confidence values for item $i$
+            \item $p(i)$ is the vector of preferences for item $i$
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Advantages and Limitations of ALS}
+
+\textbf{Advantages}
+\begin{itemize}
+    \item \textbf{Mathematical Properties}
+    \begin{itemize}
+        \item Guaranteed to converge to at least a local optimum
+        \item Each update has a closed-form solution
+        \item Easier to parallelize than SGD methods
+    \end{itemize}
+    
+    \item \textbf{Performance Characteristics}
+    \begin{itemize}
+        \item Works well with implicit feedback (e.g., views, clicks)
+        \item Handles large, sparse datasets efficiently
+        \item Often converges in fewer iterations than gradient methods
+    \end{itemize}
+\end{itemize}
+
+\textbf{Limitations}
+\begin{itemize}
+    \item Computationally expensive for very large datasets
+    \item Requires matrix inversions or solving linear systems
+    \item Less effective when factors should be constrained (e.g., non-negative)
+    \item Cold-start problems for new users and items
+\end{itemize}
+\end{frame}
+
+\subsection{PurePMF}
+\begin{frame}
+\frametitle{What is PurePMF?}
+
+\begin{itemize}
+    \item A pure Python implementation of Probabilistic Matrix Factorization (PMF)
+    \item Matrix factorization technique with a principled probabilistic interpretation
+    \item Core principle: Models ratings as $R = P \cdot Q^T + \epsilon$ where $\epsilon$ is Gaussian noise
+    \item Goal: Learn latent factors that maximize the posterior probability of observed ratings
+    \item Places Gaussian priors on user and item latent factors for regularization
+    
+    \vspace{1cm}
+
+    \item \textit{PurePMF extends standard matrix factorization with a probabilistic framework, offering better theoretical justification and uncertainty quantification while maintaining computational efficiency}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{n\_factors}: Number of latent factors (default=10)
+        \item \textbf{n\_epochs}: Number of iterations for SGD (default=50)
+        \item \textbf{lr}: Learning rate for gradient descent (default=0.005)
+        \item \textbf{user\_reg/item\_reg}: Separate regularization terms (default=0.1)
+        \item \textbf{lr\_decay}: Learning rate decay factor (default=0.95)
+        \item \textbf{min\_lr}: Minimum learning rate (default=0.001)
+        \item \textbf{init\_std}: Standard deviation for initial factor values (default=0.1)
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item User factors matrix (users × factors)
+        \item Item factors matrix (items × factors)
+        \item Rating normalization parameters
+        \item ID mapping dictionaries
+        \item Global mean rating
+    \end{itemize}
+
+    \vspace{1cm}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Train the model using stochastic gradient descent
+        \item \textbf{predict}: Generate rating predictions
+        \item \textbf{get\_user/item\_factors}: Access learned factors
+        \item \textbf{calculate\_posterior\_variance}: Compute uncertainty measures
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the PMF Model}
+
+    \textbf{1. Data Processing}
+    \begin{itemize}
+        \item Process input (user, item, rating) tuples
+        \item Create ID mappings for users and items
+        \item Calculate global mean rating and rating bounds
+    \end{itemize}
+
+    \vspace{0.5cm}
+    
+    \textbf{2. Parameter Initialization}
+    \begin{itemize}
+        \item Initialize user factors from Gaussian distribution: $\mathcal{N}(0, \sigma^2)$
+        \item Initialize item factors from Gaussian distribution: $\mathcal{N}(0, \sigma^2)$
+        \item This aligns with PMF's probabilistic interpretation
+    \end{itemize}
+
+    \vspace{0.5cm}
+    
+    \textbf{3. Rating Normalization}
+    \begin{itemize}
+        \item Scale ratings to [0, 1] range for numerical stability
+        \item Store scaling parameters for later denormalization
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - The SGD Process with Momentum}
+    \textbf{SGD Training Process}
+    \begin{itemize}
+        \item Initialize momentum vectors for user and item factors
+        \item For each epoch:
+        \begin{itemize}
+            \item Shuffle training data for better convergence
+            \item For each rating $(u, i, r_{ui})$:
+            \begin{itemize}
+                \item Compute prediction: $\hat{r}_{ui} = p_u^T q_i$
+                \item Calculate error: $e_{ui} = r_{ui} - \hat{r}_{ui}$
+                \item Compute gradients with separate regularization terms:
+                \begin{align*}
+                \nabla_{p_u} &= -e_{ui} \cdot q_i + \lambda_u \cdot p_u \\
+                \nabla_{q_i} &= -e_{ui} \cdot p_u + \lambda_i \cdot q_i
+                \end{align*}
+                \item Update factors using momentum:
+                \begin{align*}
+                v_{p_u} &= \alpha \cdot v_{p_u} - \eta \cdot \nabla_{p_u} \\
+                p_u &= p_u + v_{p_u} \\
+                v_{q_i} &= \alpha \cdot v_{q_i} - \eta \cdot \nabla_{q_i} \\
+                q_i &= q_i + v_{q_i}
+                \end{align*}
+            \end{itemize}
+            \item Track and report RMSE progress
+            \item Decay learning rate: $\eta = \max(\eta_{\min}, \eta \cdot \gamma)$
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction}
+
+\begin{enumerate}
+    \item \textbf{Initial Checks}
+    \begin{itemize}
+        \item Verify user and item exist in training data
+        \item Return global mean for cold-start cases
+    \end{itemize}
+    
+    \item \textbf{Normalized Prediction}
+    \begin{itemize}
+        \item Retrieve user and item latent factors
+        \item Compute dot product between factors: $\text{norm\_pred} = p_u^T q_i$
+        \item Clip normalized prediction to [0,1] range
+    \end{itemize}
+    
+    \item \textbf{Denormalization}
+    \begin{itemize}
+        \item Convert from normalized [0,1] scale back to original rating scale:
+        \begin{align*}
+        \text{prediction} = \text{norm\_pred} \times \text{rating\_range} + \text{min\_rating}
+        \end{align*}
+        \item Clip final prediction to valid rating range (typically 1-5)
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Additional Methods}
+
+\begin{itemize}
+    \item \textbf{get\_user\_factors / get\_item\_factors}
+    \begin{itemize}
+        \item Return learned latent factors for specific users or items
+        \item Useful for similarity calculations and feature analysis
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \item \textbf{calculate\_posterior\_variance}
+    \begin{itemize}
+        \item Unique to probabilistic models like PMF
+        \item Provides uncertainty estimates for learned factors
+        \item In PMF, posterior variance is related to regularization parameters:
+        \begin{align*}
+        \sigma^2_{user} &= \frac{1}{\lambda_{user}} \\
+        \sigma^2_{item} &= \frac{1}{\lambda_{item}}
+        \end{align*}
+        \item Lower regularization implies higher variance (more uncertainty)
+        \item Can be used for confidence intervals on predictions
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: Probabilistic Matrix Factorization}
+
+% \textbf{PMF Core Principles}
+\begin{itemize}
+    \item Extends matrix factorization with a probabilistic interpretation
+    \item Models observed ratings as samples from a probability distribution
+    \item Assumes ratings follow Gaussian distribution centered on the dot product of factors:
+    \begin{align*}
+    p(R|P,Q,\sigma^2) = \prod_{(u,i) \in K} \mathcal{N}(r_{ui} | p_u^T q_i, \sigma^2)
+    \end{align*}
+    \item Places Gaussian priors on user and item factors:
+    \begin{align*}
+    p(P|\sigma_P^2) &= \prod_{u} \mathcal{N}(p_u | 0, \sigma_P^2 I) \\
+    p(Q|\sigma_Q^2) &= \prod_{i} \mathcal{N}(q_i | 0, \sigma_Q^2 I)
+    \end{align*}
+    \item Seeks maximum a posteriori (MAP) estimation of factors
+    \item Provides theoretical basis for the squared error loss and regularization terms
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Training Process: The PMF Algorithm}
+\textbf{MAP Estimation through SGD}
+\begin{enumerate}
+    \item Initialize factor matrices with small random values from a Gaussian distribution
+    \item Maximize log posterior probability, which is equivalent to minimizing:
+    \begin{align*}
+    \min_{P,Q} \sum_{(u,i) \in K} (r_{ui} - p_u^T q_i)^2 + \lambda_P \sum_u ||p_u||^2 + \lambda_Q \sum_i ||q_i||^2
+    \end{align*}
+    where:
+    \begin{itemize}
+        \item $\lambda_P = \frac{\sigma^2}{\sigma_P^2}$ is the user regularization parameter
+        \item $\lambda_Q = \frac{\sigma^2}{\sigma_Q^2}$ is the item regularization parameter
+    \end{itemize}
+    \item For each iteration of SGD:
+    \begin{itemize}
+        \item Sample a rating $(u,i,r_{ui})$
+        \item Update factors in the direction of steepest gradient descent
+        \item Apply momentum to accelerate convergence and avoid local minima
+        \item Adaptively reduce learning rate to ensure convergence
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Advantages and Limitations of PMF}
+
+\textbf{Advantages}
+\begin{itemize}
+    \item \textbf{Theoretical Foundation}
+    \begin{itemize}
+        \item Provides a principled probabilistic interpretation
+        \item Naturally justifies the use of L2 regularization
+        \item Enables uncertainty quantification in predictions
+    \end{itemize}
+    
+    \item \textbf{Performance Characteristics}
+    \begin{itemize}
+        \item Good performance on sparse datasets
+        \item Scalable through stochastic gradient methods
+        \item Can incorporate additional priors for domain knowledge
+    \end{itemize}
+\end{itemize}
+
+\textbf{Limitations}
+\begin{itemize}
+    \item Assumes Gaussian distributions which may not always be appropriate
+    \item SGD training can be sensitive to hyperparameters
+    \item Still suffers from cold-start problems for new users/items
+    \item Full Bayesian treatment would require more complex inference methods
+\end{itemize}
+\end{frame}
+
+\section{Content-Based Filtering: Introduction}
+\begin{frame}
+\frametitle{What is Content-Based Filtering?}
+
+\begin{columns}
+\column{0.55\textwidth}
+\textbf{Core Concept:}
+\begin{itemize}
+    \item Recommends items similar to what users liked in the past
+    \item Uses item features/attributes rather than user ratings
+    \item Each item represented as a feature vector
+    \item Each user has a preference profile based on liked items
+    \item "If you liked this movie with these actors and genre, you'll like similar ones"
+\end{itemize}
+
+\column{0.45\textwidth}
+\textbf{Examples of Item Features:}
+\begin{itemize}
+    \item \textbf{Movies:} genre, director, actors, keywords
+    \item \textbf{News:} topics, authors, entities mentioned
+    \item \textbf{Products:} category, brand, price range, specifications
+\end{itemize}
+\end{columns}
+
+\vspace{0.5cm}
+\begin{center}
+\textit{Unlike collaborative filtering, content-based approaches can recommend items with no ratings and don't suffer from the cold-start problem for new items}
+\end{center}
+\end{frame}
+
+\subsection{PureDecisionTree}
+\begin{frame}
+\frametitle{What is PureDecisionTree?}
+
+\begin{itemize}
+    \item A pure Python implementation of Decision Trees for movie rating prediction
+    \item Content-based filtering approach using movie features (genres and release year)
+    \item Core principle: Creates regression trees to predict ratings based on movie attributes
+    \item Goal: Build personalized decision trees for each user to predict ratings for unseen movies
+    \item Uses movie content features rather than collaborative patterns between users
+    
+    \vspace{1cm}
+
+    \item \textit{PureDecisionTree bridges content-based filtering with supervised learning, creating a separate decision model for each user based on their historical preferences for movies with specific features}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{max\_depth}: Maximum depth of the decision tree (default=8)
+        \item \textbf{min\_samples\_split}: Minimum samples required to split a node (default=5)
+    \end{itemize}
+    
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item \textbf{user\_trees}: Dictionary mapping user IDs to their personalized decision trees
+        \item \textbf{movie\_features}: Dictionary mapping movie IDs to feature vectors
+        \item \textbf{user\_avg\_ratings}: Average rating for each user (for fallback)
+        \item \textbf{global\_mean}: Global mean rating (for ultimate fallback)
+        \item \textbf{Node}: Helper class representing nodes in the decision tree
+    \end{itemize}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Train personalized trees for users with sufficient ratings
+        \item \textbf{predict}: Generate rating predictions using appropriate tree
+        \item \textbf{\_build\_tree}: Recursively create the tree structure
+        \item \textbf{\_best\_split}: Find optimal feature and threshold for splitting
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the Decision Tree Models}
+
+    \textbf{1. Feature Extraction}
+    \begin{itemize}
+        \item Load movie content features (genres and release year)
+        \item Create feature vectors for each movie:
+        \begin{itemize}
+            \item Binary encoding for each genre (1 if present, 0 if not)
+            \item Normalized release year (divided by a constant)
+        \end{itemize}
+        \item Example: [0, 1, 1, 0, ..., 0, 0.995] for an Action/Adventure movie from 2019
+    \end{itemize}
+
+    \vspace{0.5cm}
+    
+    \textbf{2. Rating Organization}
+    \begin{itemize}
+        \item Group ratings by user
+        \item Calculate global mean rating and per-user average ratings
+        \item Filter to include only users with sufficient ratings (e.g., 20+)
+    \end{itemize}
+
+    \vspace{0.5cm}
+    
+    \textbf{3. User-Specific Tree Creation}
+    \begin{itemize}
+        \item For each eligible user:
+        \begin{itemize}
+            \item Extract feature vectors and ratings for movies they've rated
+            \item Build a personalized decision tree using these examples
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: \_build\_tree() - The Tree Construction Process}
+    \textbf{Recursive Tree Building}
+    \begin{itemize}
+        \item Create a node for the current partition of data
+        \item Check stopping criteria:
+        \begin{itemize}
+            \item Maximum depth reached
+            \item Minimum samples for splitting not met
+            \item All ratings in the node are identical
+        \end{itemize}
+        \item If stopping criteria met: create a leaf node with average rating
+        \item Otherwise:
+        \begin{itemize}
+            \item Find best feature and threshold for splitting using variance reduction
+            \item Split data into left and right partitions
+            \item Recursively build subtrees for each partition
+            \item Store split information (feature index and threshold) in the node
+        \end{itemize}
+    \end{itemize}
+    
+    \textbf{Key insight}: Each split aims to maximize the reduction in variance of ratings, creating more homogeneous groups that lead to more accurate predictions
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: \_best\_split() - Finding Optimal Splits}
+
+\begin{itemize}
+    \item \textbf{Splitting Criterion}: Variance Reduction
+    \begin{itemize}
+        \item Goal: Find feature and threshold that maximizes variance reduction
+        \item Variance reduction = parent variance - weighted average of child variances
+        \item Mathematical formulation:
+        \begin{align*}
+        \Delta Var = Var(S) - \left(\frac{|S_L|}{|S|} Var(S_L) + \frac{|S_R|}{|S|} Var(S_R)\right)
+        \end{align*}
+        where:
+        \begin{itemize}
+            \item $S$ is the set of examples at the current node
+            \item $S_L$ and $S_R$ are the left and right subsets after splitting
+            \item $Var(S)$ is the variance of ratings in set $S$
+        \end{itemize}
+    \end{itemize}
+    
+    \item \textbf{Split Selection Process}
+    \begin{itemize}
+        \item For each feature:
+        \begin{itemize}
+            \item For genre features (binary): use threshold of 0.5
+            \item For year feature (continuous): try multiple thresholds
+            \item Evaluate variance reduction for each potential split
+            \item Keep track of best split found so far
+        \end{itemize}
+        \item Return feature index and threshold that yield maximum variance reduction
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction}
+
+\begin{enumerate}
+    \item \textbf{Initial Checks}
+    \begin{itemize}
+        \item Verify movie exists in feature database
+        \item If not, prediction is impossible
+    \end{itemize}
+    
+    \item \textbf{Tree-Based Prediction}
+    \begin{itemize}
+        \item Check if user has a personalized decision tree
+        \item If yes:
+        \begin{itemize}
+            \item Retrieve movie feature vector
+            \item Traverse tree from root to leaf by comparing feature values to node thresholds
+            \item Return the value stored at the reached leaf node
+        \end{itemize}
+        \item Clip prediction to valid rating range (1-5)
+    \end{itemize}
+    
+    \item \textbf{Fallback Strategies}
+    \begin{itemize}
+        \item If user has no tree but has ratings: return user's average rating
+        \item If user is completely new: return global mean rating
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: Decision Trees for Regression}
+
+\begin{itemize}
+    \item Tree-based supervised learning method for predicting continuous values
+    \item Creates a hierarchical structure of if-then rules based on features
+    \item Divides feature space into regions with similar target values
+    \item Predictions made by navigating from root to leaf based on feature values
+    \item Each leaf contains the average rating of training examples in that region
+    \item Naturally handles:
+    \begin{itemize}
+        \item Both categorical features (genres) and numerical features (year)
+        \item Non-linear relationships between features and ratings
+        \item Feature interactions (e.g., preference for action movies, but only from recent years)
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Training Process: The Decision Tree Algorithm}
+\textbf{Tree Construction Steps}
+\begin{enumerate}
+    \item Start with all training data at the root node
+    \item For each node:
+    \begin{itemize}
+        \item Calculate current variance of ratings
+        \item For each feature and potential threshold:
+        \begin{itemize}
+            \item Split data according to the threshold
+            \item Calculate variance of each resulting subset
+            \item Compute variance reduction:
+            \begin{align*}
+            \Delta Var = Var(S) - \left(\frac{n_L}{n} Var(S_L) + \frac{n_R}{n} Var(S_R) \right)
+            \end{align*}
+        \end{itemize}
+        \item Choose split that maximizes variance reduction
+        \item If meaningful split found, create internal node and continue recursively
+        \item Otherwise, create leaf node with the mean rating
+    \end{itemize}
+    \item Stopping criteria prevent overfitting:
+    \begin{itemize}
+        \item Maximum depth reached
+        \item Minimum samples for a split not met
+        \item No significant variance reduction possible
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Advantages and Limitations of Decision Trees}
+
+\textbf{Advantages}
+\begin{itemize}
+    \item \textbf{Interpretability}
+    \begin{itemize}
+        \item Clear decision rules that can explain predictions
+        \item Easy to understand which features influence recommendations
+        \item Provides insights into user preferences
+    \end{itemize}
+    
+    \item \textbf{Content-Based Benefits}
+    \begin{itemize}
+        \item No cold-start problem for new items with known features
+        \item Can recommend niche items that have few or no ratings
+        \item Privacy-preserving (doesn't require data from other users)
+    \end{itemize}
+\end{itemize}
+
+\textbf{Limitations}
+\begin{itemize}
+    \item Limited by available content features
+    \item Can't capture collaborative patterns across users
+    \item May create over-specialized recommendations
+    \item Requires separate tree training for each user
+    \item Cold-start problem for new users still exists
+\end{itemize}
+\end{frame}
+
+\subsection{PureSVM}
+\begin{frame}
+\frametitle{What is PureSVM?}
+
+\begin{itemize}
+    \item A pure Python implementation of Support Vector Regression (SVR) for movie rating prediction
+    \item Content-based filtering approach using movie features (genres and release year)
+    \item Core principle: Creates a hyperplane in feature space that best predicts ratings with minimal error
+    \item Goal: Build personalized SVR models for each user to predict ratings for unseen movies
+    \item Uses epsilon-insensitive loss function that tolerates small errors
+    
+    \vspace{1cm}
+
+    \item \textit{PureSVM applies Support Vector Regression to recommendation, creating a personalized regression model for each user based on their historical preferences and movie features, balancing accuracy with generalization}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{C}: Regularization parameter (default=1.0)
+        \item \textbf{epsilon}: Width of the insensitive zone (default=0.1)
+        \item \textbf{learning\_rate}: Step size for gradient descent (default=0.001)
+        \item \textbf{max\_iterations}: Maximum training iterations (default=1000)
+    \end{itemize}
+    
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item \textbf{user\_models}: Dictionary mapping user IDs to their personalized SVR models
+        \item \textbf{movie\_features}: Dictionary mapping movie IDs to feature vectors
+        \item Each model contains: weights, bias, and feature normalization parameters
+    \end{itemize}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Train personalized SVR models for users with sufficient ratings
+        \item \textbf{predict}: Generate rating predictions using appropriate model
+        \item \textbf{\_normalize\_features}: Scale features to [0,1] range
+        \item \textbf{\_compute\_gradient}: Calculate gradients for model optimization
+        \item \textbf{\_stochastic\_gradient\_descent}: Core optimization algorithm
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the SVR Models}
+
+    \textbf{1. Feature Extraction}
+    \begin{itemize}
+        \item Load movie content features (genres and release year)
+        \item Create feature vectors for each movie:
+        \begin{itemize}
+            \item Binary encoding for each genre (1 if present, 0 if not)
+            \item Release year as a numerical feature
+        \end{itemize}
+        \item Example: [0, 1, 1, 0, ..., 0, 2019] for an Action/Adventure movie from 2019
+    \end{itemize}
+
+    \vspace{0.5cm}
+    
+    \textbf{2. Rating Organization}
+    \begin{itemize}
+        \item Group ratings by user
+        \item Filter to include only users with sufficient ratings (minimum 10)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the SVR Models}
+    \textbf{3. User-Specific Model Creation}
+    \begin{itemize}
+        \item For each eligible user:
+        \begin{itemize}
+            \item Extract feature vectors and ratings for movies they've rated
+            \item Train a personalized SVR model using stochastic gradient descent
+            \item Store model parameters (weights, bias, normalization constants)
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: \_stochastic\_gradient\_descent() - The Optimization Process}
+    \textbf{SVR Parameter Optimization}
+    \begin{itemize}
+        \item Initialize weights to zeros, bias to zero
+        \item Normalize features to [0,1] range for stable training
+        \item For each iteration:
+        \begin{itemize}
+            \item Shuffle the training data for better convergence
+            \item Process data in mini-batches for efficiency
+            \item For each mini-batch:
+            \begin{itemize}
+                \item Compute gradients using epsilon-insensitive loss
+                \item Update weights and bias using calculated gradients
+            \end{itemize}
+            \item Periodically check convergence using loss function
+            \item Stop if loss improvement falls below threshold
+        \end{itemize}
+    \end{itemize}
+    
+    \textbf{Key insight}: The epsilon-insensitive loss means that errors smaller than epsilon contribute nothing to the gradient, creating a "tube" around the regression line where small errors are tolerated
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: \_compute\_gradient() - Gradient Calculation}
+
+\begin{itemize}
+    \item \textbf{Epsilon-insensitive Loss Concept}
+    \begin{itemize}
+        \item Standard SVR uses a loss function that ignores errors smaller than epsilon
+        \item Only errors outside the epsilon tube contribute to model updates
+        \item Mathematical formulation of epsilon-insensitive loss:
+        \begin{align*}
+        L_{\epsilon}(y, f(x)) = \max(0, |y - f(x)| - \epsilon)
+        \end{align*}
+        where:
+        \begin{itemize}
+            \item $y$ is the actual rating
+            \item $f(x)$ is the predicted rating
+            \item $\epsilon$ is the width of the insensitive zone
+        \end{itemize}
+    \end{itemize}
+    
+    \item \textbf{Gradient Computation Process}
+    \begin{itemize}
+        \item For each sample in the batch:
+        \begin{itemize}
+            \item Calculate prediction: $\hat{y} = \mathbf{w}^T \mathbf{x} + b$
+            \item Compute error: $e = \hat{y} - y$
+            \item If $|e| \leq \epsilon$: No gradient contribution (in the tube)
+            \item If $|e| > \epsilon$: Gradient direction depends on error sign
+            \item Add regularization term to weight gradient: $2C\mathbf{w}$
+        \end{itemize}
+        \item Average gradients over the batch
+        \item Return weight and bias gradients for parameter updates
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction}
+
+\begin{enumerate}
+    \item \textbf{Initial Checks}
+    \begin{itemize}
+        \item Verify user has a trained model
+        \item Verify movie exists in feature database
+        \item Return None if either check fails
+    \end{itemize}
+    
+    \item \textbf{Model-Based Prediction}
+    \begin{itemize}
+        \item Retrieve user's trained model (weights, bias, normalization parameters)
+        \item Get movie feature vector
+        \item Normalize features using user's specific normalization parameters:
+        \begin{align*}
+        \mathbf{x}_{\text{normalized}} = \frac{\mathbf{x} - \mathbf{min\_vals}}{\mathbf{range\_vals}}
+        \end{align*}
+        \item Compute prediction as linear function:
+        \begin{align*}
+        \hat{r} = \mathbf{w}^T \mathbf{x}_{\text{normalized}} + b
+        \end{align*}
+        \item Clip prediction to valid rating range (1-5)
+    \end{itemize}
+    
+    \item \textbf{Fallback Strategy}
+    \begin{itemize}
+        \item If prediction is impossible, return None (handled by adapter class)
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: Support Vector Regression (SVR)}
+
+\begin{itemize}
+    \item Regression variant of Support Vector Machines (SVMs)
+    \item Aims to find a function that has at most $\epsilon$ deviation from target ratings
+    \item Creates a "tube" around the regression hyperplane where errors are ignored
+    \item Balances two objectives:
+    \begin{itemize}
+        \item Minimize the complexity of the model (flat hyperplane)
+        \item Minimize prediction errors outside the epsilon-tube
+    \end{itemize}
+    \item Formally tries to solve:
+    \begin{align*}
+    \min_{\mathbf{w}, b} \frac{1}{2}||\mathbf{w}||^2 + C \sum_{i=1}^{n} L_{\epsilon}(y_i, f(\mathbf{x}_i))
+    \end{align*}
+    where:
+    \begin{itemize}
+        \item First term controls model complexity (regularization)
+        \item Second term penalizes prediction errors beyond epsilon
+        \item C controls the trade-off between these objectives
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Training Process: The Support Vector Regression Algorithm}
+\textbf{SVR Optimization Steps}
+\begin{enumerate}
+    \item Prepare and normalize feature data for each user
+    \item Initialize model parameters (weights to 0, bias to 0)
+    \item For each iteration of SGD:
+    \begin{itemize}
+        \item Shuffle training data to avoid learning bias
+        \item Process data in mini-batches for computational efficiency
+        \item For each mini-batch:
+        \begin{itemize}
+            \item Make predictions: $\hat{y}_i = \mathbf{w}^T \mathbf{x}_i + b$
+            \item Calculate errors: $e_i = \hat{y}_i - y_i$
+            \item Apply epsilon-insensitive loss:
+                \item If $|e_i| \leq \epsilon$: Error contributes nothing to gradient
+                \item If $|e_i| > \epsilon$: Error contributes to gradient based on sign
+            \item Update weights: $\mathbf{w} = \mathbf{w} - \eta (\nabla L_{\mathbf{w}} + 2C\mathbf{w})$
+            \item Update bias: $b = b - \eta \nabla L_b$
+        \end{itemize}
+        \item Periodically evaluate convergence
+    \end{itemize}
+    \item Store final model parameters for each user
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Advantages and Limitations of SVR for Recommendations}
+    \textbf{Advantages}
+    \begin{itemize}
+        \item Epsilon-insensitive loss makes model robust to noisy ratings
+        \item Regularization prevents overfitting to training examples
+        \item Works well with high-dimensional feature spaces
+    \end{itemize}
+
+    \vspace{1cm}
+    
+    \textbf{Content-Based Benefits}
+    \begin{itemize}
+        \item Can recommend items with no rating history (no cold-start for items)
+        \item Explanations are straightforward ("recommended because it has features X")
+        \item No dependency on other users' data (privacy friendly)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Advantages and Limitations of SVR for Recommendations}
+    \textbf{Limitations}
+    \begin{itemize}
+        \item Requires sufficient ratings per user to train effective models
+        \item Limited by the quality and expressiveness of available features
+        \item Cannot capture complex non-linear relationships without kernel tricks
+        \item Cold-start problem for new users still exists
+        \item Training separate models for each user is computationally intensive
+    \end{itemize}
+\end{frame}
+
+\subsection{PureNaiveBayes}
+\begin{frame}
+\frametitle{What is PureNaiveBayes?}
+
+\begin{itemize}
+    \item A pure Python implementation of Naive Bayes for movie rating prediction
+    \item Content-based filtering approach that applies Bayesian probability to recommendation
+    \item Core principle: Uses Bayes' theorem to calculate P(rating | features) for movie attributes
+    \item Goal: Find the most likely rating given a movie's content features like genres and release year
+    \item Applies user-specific personalization to adjust predictions based on user's rating history
+    
+    \vspace{1cm}
+
+    \item \textit{PureNaiveBayes treats rating prediction as a probabilistic classification problem, learning which movie characteristics are associated with different rating levels and making predictions that balance feature evidence with user preferences}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{rating\_levels}: Number of possible rating values (default=5)
+    \end{itemize}
+    
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item \textbf{genre\_priors}: Conditional probabilities P(genre=1|rating) for each genre and rating
+        \item \textbf{year\_mean/year\_var}: Mean and variance of release years for each rating level
+        \item \textbf{rating\_priors}: Prior probabilities P(rating) for each rating level
+        \item \textbf{user\_avg\_ratings}: Average rating for each user (for personalization)
+        \item \textbf{global\_mean}: Global mean rating across all users
+    \end{itemize}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Train the model by calculating probability distributions
+        \item \textbf{predict}: Generate personalized rating predictions using Bayes' theorem
+        \item \textbf{\_gaussian\_probability}: Calculate probabilities for numerical features
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the Naive Bayes Model}
+
+    \textbf{1. Feature Extraction}
+    \begin{itemize}
+        \item Load movie content features (genres and release year)
+        \item Create feature vectors for each movie:
+        \begin{itemize}
+            \item Binary encoding for each genre (1 if present, 0 if not)
+            \item Release year as a numerical feature
+        \end{itemize}
+    \end{itemize}
+
+    \vspace{0.5cm}
+    
+    \textbf{2. Data Preprocessing}
+    \begin{itemize}
+        \item Filter ratings to include only movies with known features
+        \item Calculate global mean rating across all users and movies
+        \item Calculate per-user average ratings for personalization
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Training the Naive Bayes Model}
+    \textbf{3. Probability Calculation}
+    \begin{itemize}
+        \item Count occurrences of each rating level to compute P(rating)
+        \item For each genre and rating level, count co-occurrences to compute P(genre=1|rating)
+        \item For each rating level, calculate mean and variance of movie release years
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Probability Estimation and Smoothing}
+    \textbf{Probability Estimation Process}
+    \begin{itemize}
+        \item \textbf{Prior Probabilities}
+        \begin{itemize}
+            \item Calculate rating priors: $P(rating = r) = \frac{\text{count}(r)}{\text{total ratings}}$
+        \end{itemize}
+        
+        \item \textbf{Conditional Probabilities for Genres}
+        \begin{itemize}
+            \item Apply Laplace smoothing for reliable probability estimates:
+            \begin{align*}
+            P(\text{genre}_i = 1 | \text{rating} = r) = \frac{\text{count}(\text{genre}_i = 1, \text{rating} = r) + 1}{\text{count}(\text{rating} = r) + 2}
+            \end{align*}
+            \item Smoothing prevents zero probabilities for unseen feature-rating combinations
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Probability Estimation and Smoothing}
+    \textbf{Probability Estimation Process}
+    \begin{itemize}        
+        \item \textbf{Gaussian Parameters for Release Year}
+        \begin{itemize}
+            \item For each rating level, calculate mean and variance:
+            \begin{align*}
+            \mu_r &= \frac{1}{n_r} \sum_{i: \text{rating}_i = r} \text{year}_i\\
+            \sigma^2_r &= \frac{1}{n_r} \sum_{i: \text{rating}_i = r} (\text{year}_i - \mu_r)^2 + 1
+            \end{align*}
+            \item Add small constant to variance to prevent numerical issues
+        \end{itemize}
+    \end{itemize}
+    
+    \textbf{Key insight}: Laplace smoothing and variance stabilization ensure robust probability estimates even with sparse data
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction with Bayes' Theorem}
+
+    \textbf{1. Initial Checks}
+    \begin{itemize}
+        \item Verify movie exists in feature database
+        \item If not, prediction is impossible
+    \end{itemize}
+    
+    \textbf{2. Feature Extraction}
+    \begin{itemize}
+        \item Retrieve genre indicators and release year for the target movie
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction with Bayes' Theorem}
+
+    \textbf{3. Bayesian Inference}
+    \begin{itemize}
+        \item For each possible rating level $r$:
+        \begin{itemize}
+            \item Start with prior probability: $\log P(r)$
+            \item For each genre feature, add:
+            \begin{align*}
+            \log P(\text{genre}_i | r) = 
+            \begin{cases} 
+            \log P(\text{genre}_i = 1 | r) & \text{if movie has genre}_i \\
+            \log(1 - P(\text{genre}_i = 1 | r)) & \text{otherwise}
+            \end{cases}
+            \end{align*}
+            \item For release year, add log Gaussian probability:
+            \begin{align*}
+            \log P(\text{year} | r) = \log\left(\frac{1}{\sqrt{2\pi\sigma^2_r}} e^{-\frac{(\text{year} - \mu_r)^2}{2\sigma^2_r}}\right)
+            \end{align*}
+        \end{itemize}
+        \item Identify rating with maximum log probability
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction with Bayes' Theorem}
+
+    \textbf{4. Personalization}
+    \begin{itemize}
+        \item Adjust prediction using user's rating bias:
+        \begin{align*}
+        \text{rating}_{\text{personalized}} = r_{\text{max}} + \alpha \cdot (\text{avg}_{\text{user}} - \text{avg}_{\text{global}})
+        \end{align*}
+        \item $\alpha = 0.25$ controls the strength of personalization
+        \item Clip final prediction to valid rating range (1-5)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: Naive Bayes for Recommendations}
+
+\begin{itemize}
+    \item Applies Bayesian probability to the recommendation problem
+    \item Core idea: Model P(rating | features) using Bayes' theorem:
+    \begin{align*}
+    P(\text{rating} | \text{features}) \propto P(\text{features} | \text{rating}) \cdot P(\text{rating})
+    \end{align*}
+    
+    \item "Naive" assumption: Features are conditionally independent given the rating:
+    \begin{align*}
+    P(\text{features} | \text{rating}) = \prod_i P(\text{feature}_i | \text{rating})
+    \end{align*}
+    
+    \item Models different features differently:
+    \begin{itemize}
+        \item Binary genre features: Bernoulli distribution
+        \item Continuous year feature: Gaussian distribution
+    \end{itemize}
+    
+    \item Works with log probabilities for numerical stability:
+    \begin{align*}
+    \log P(\text{rating} | \text{features}) \propto \log P(\text{rating}) + \sum_i \log P(\text{feature}_i | \text{rating})
+    \end{align*}
+    
+    \item Makes prediction by finding the rating with maximum posterior probability (MAP estimate)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Training Process: The Naive Bayes Algorithm}
+\textbf{Learning Steps}
+\begin{enumerate}
+    \item \textbf{Prior Probability Estimation}
+    \begin{itemize}
+        \item Count frequency of each rating level
+        \item Calculate $P(rating) = \frac{\text{count(rating)}}{\text{total ratings}}$
+    \end{itemize}
+    
+    \item \textbf{Conditional Probability Estimation}
+    \begin{itemize}
+        \item For categorical features (genres):
+        \begin{itemize}
+            \item Count co-occurrences of each genre with each rating
+            \item Apply Laplace smoothing to avoid zero probabilities:
+            \begin{align*}
+            P(\text{genre} = 1 | \text{rating}) = \frac{\text{count(genre=1, rating)} + 1}{\text{count(rating)} + 2}
+            \end{align*}
+        \end{itemize}
+        \item For numerical features (release year):
+        \begin{itemize}
+            \item Fit Gaussian distribution to years for each rating level
+            \item Calculate $\mu_r$ (mean) and $\sigma^2_r$ (variance)
+        \end{itemize}
+    \end{itemize}
+    
+    \item \textbf{Personalization Parameters}
+    \begin{itemize}
+        \item Calculate average rating for each user
+        \item Store user rating deviations from global mean
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Advantages and Limitations of Naive Bayes for Recommendations}
+
+\textbf{Advantages}
+\begin{itemize}
+    \item \textbf{Probabilistic Foundation}
+    \begin{itemize}
+        \item Provides principled way to combine multiple feature types
+        \item Naturally handles uncertainty and missing data
+        \item Can incorporate prior knowledge about rating distributions
+    \end{itemize}
+    
+    \item \textbf{Practical Benefits}
+    \begin{itemize}
+        \item Computationally efficient (no complex optimization)
+        \item Works well with small training sets
+        \item Fast prediction time
+        \item Simple yet often surprisingly effective
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Advantages and Limitations of Naive Bayes for Recommendations}
+
+\textbf{Limitations}
+\begin{itemize}
+    \item "Naive" independence assumption often violated in real data
+    \item Less expressive than more complex models for capturing feature interactions
+    \item Sensitive to feature representation choices
+    \item May require careful smoothing for reliable probability estimates
+    \item Limited by available content features quality
+\end{itemize}
+\end{frame}
+
+\subsection{PureTFIDF}
+\begin{frame}
+\frametitle{What is PureTFIDF?}
+
+\begin{itemize}
+    \item A pure Python implementation of TF-IDF (Term Frequency-Inverse Document Frequency) for movie recommendations
+    \item Content-based filtering approach that analyzes movie titles, genres, and user-generated tags
+    \item Core principle: Textual similarity between items indicates similar user preferences
+    \item Goal: Use text representations to find similar movies and predict user ratings
+    \item Combines text mining with nearest-neighbor collaborative techniques
+    
+    \vspace{1cm}
+
+    \item \textit{PureTFIDF transforms movie metadata into a rich feature space where semantic relationships are captured through word importance weighting, enabling recommendations based on content similarity rather than user overlap}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Class Structure: Key Components}
+
+\begin{itemize}
+    \item \textbf{Initialization Parameters}
+    \begin{itemize}
+        \item \textbf{k}: Number of nearest neighbors to consider (default=40)
+    \end{itemize}
+    
+    \item \textbf{Key Data Structures}
+    \begin{itemize}
+        \item \textbf{movie\_documents}: Preprocessed text for each movie
+        \item \textbf{vocabulary}: List of significant terms across all documents
+        \item \textbf{tfidf\_vectors}: TF-IDF weight vectors for each movie
+        \item \textbf{similarities}: Precomputed similarity matrix between all movie pairs
+        \item \textbf{user\_ratings}: User rating history for prediction
+    \end{itemize}
+    
+    \item \textbf{Primary Methods}
+    \begin{itemize}
+        \item \textbf{fit}: Build vocabulary, compute TF-IDF vectors and similarities
+        \item \textbf{predict}: Generate rating predictions using similar movies
+        \item \textbf{\_preprocess\_text}: Clean and tokenize text data
+        \item \textbf{\_compute\_cosine\_similarity}: Calculate similarity between vectors
+        \item \textbf{get\_similar\_movies}: Find most similar movies to a given movie
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Text Processing and Feature Extraction}
+
+    \textbf{1. Document Creation}
+    \begin{itemize}
+        \item Load movie metadata (titles, genres) and user tags
+        \item For each movie, create a text document by combining:
+        \begin{itemize}
+            \item Movie title (with year extracted)
+            \item Genre information (converted to text)
+            \item User-generated tags (aggregated)
+        \end{itemize}
+        \item Example: "Toy Story animation adventure fantasy fun pixar childhood 1995"
+    \end{itemize}
+
+    \vspace{0.5cm}
+    
+    \textbf{2. Text Preprocessing}
+    \begin{itemize}
+        \item Convert all text to lowercase
+        \item Remove punctuation and numbers
+        \item Tokenize into individual words
+        \item Remove stopwords ("the", "and", "of", etc.)
+        \item Filter out very short tokens (length $<$ 3)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Vocabulary Building and TF-IDF Calculation}
+    \textbf{3. Vocabulary Construction}
+    \begin{itemize}
+        \item Collect all unique tokens across all movie documents
+        \item Filter to include only terms that appear in at least 2 documents
+        \item This reduces noise and computational complexity
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Vocabulary Building and TF-IDF Calculation}    
+    \textbf{4. TF-IDF Vector Computation}
+    \begin{itemize}
+        \item Calculate Term Frequency (TF) for each term in each document:
+        \begin{align*}
+        \text{TF}(t,d) = \frac{\text{count of term $t$ in document $d$}}{\text{total terms in document $d$}}
+        \end{align*}
+        
+        \item Calculate Inverse Document Frequency (IDF) for each term:
+        \begin{align*}
+        \text{IDF}(t) = \log\left(\frac{\text{total number of documents}}{\text{number of documents containing term $t$}}\right)
+        \end{align*}
+        
+        \item Compute TF-IDF weight for each term in each document:
+        \begin{align*}
+        \text{TF-IDF}(t,d) = \text{TF}(t,d) \times \text{IDF}(t)
+        \end{align*}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: fit() - Similarity Matrix Construction}
+    \textbf{5. Similarity Computation}
+    \begin{itemize}
+        \item For each pair of movies, compute cosine similarity between TF-IDF vectors:
+        \begin{align*}
+        \text{similarity}(i,j) = \frac{\vec{v}_i \cdot \vec{v}_j}{||\vec{v}_i|| \times ||\vec{v}_j||}
+        \end{align*}
+        
+        \item Where $\vec{v}_i$ and $\vec{v}_j$ are the TF-IDF vectors for movies $i$ and $j$
+        
+        \item For sparse vectors, efficient calculation focuses only on common terms:
+        \begin{align*}
+        \text{similarity}(i,j) = \frac{\sum_{t \in (T_i \cap T_j)} \text{TF-IDF}(t,i) \times \text{TF-IDF}(t,j)}{\sqrt{\sum_{t \in T_i} \text{TF-IDF}(t,i)^2} \times \sqrt{\sum_{t \in T_j} \text{TF-IDF}(t,j)^2}}
+        \end{align*}
+        
+        \item Store all similarities in a matrix for efficient lookup during prediction
+    \end{itemize}
+    
+    \textbf{Key insight}: Higher similarity values indicate movies with similar content features, which often correlates with similar user preferences
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: predict() - Rating Prediction}
+
+\begin{itemize}
+    \item \textbf{Process Overview}
+    \begin{itemize}
+        \item Use item-based collaborative filtering approach
+        \item Identify movies similar to target movie that user has already rated
+        \item Weight those ratings by similarity to generate prediction
+    \end{itemize}
+
+    \vspace{0.5cm}
+    
+    \item \textbf{Algorithm Steps}
+    \begin{enumerate}
+        \item Verify user has ratings and movie exists in similarity matrix
+        \item For each movie rated by the user:
+        \begin{itemize}
+            \item Retrieve similarity between this movie and target movie
+            \item Store pairs of (similarity, rating) for movies with positive similarity
+        \end{itemize}
+        \item Select top-$k$ movies with highest similarity to target
+        \item Compute weighted average of ratings:
+        \begin{align*}
+        \hat{r}_{ui} = \frac{\sum_{j \in N_i(u)} \text{sim}(i,j) \times r_{uj}}{\sum_{j \in N_i(u)} \text{sim}(i,j)}
+        \end{align*}
+        where $N_i(u)$ is the set of top-$k$ similar items rated by user $u$
+    \end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method: get\_similar\_movies() - Finding Related Content}
+
+\begin{itemize}
+    \item \textbf{Purpose}
+    \begin{itemize}
+        \item Find most similar movies to a target movie based on content
+        \item Useful for "more like this" recommendations
+        \item Acts as an explanation mechanism for recommendations
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \item \textbf{Implementation}
+    \begin{enumerate}
+        \item Retrieve target movie's index in similarity matrix
+        \item Extract similarities to all other movies
+        \item Filter out negative similarities
+        \item Sort by similarity score in descending order
+        \item Return top-$n$ most similar movies
+    \end{enumerate}
+    
+    \vspace{0.5cm}
+    
+    \item \textbf{Example Output}
+    \begin{itemize}
+        \item For "Toy Story": ["Toy Story 2", "Finding Nemo", "Monsters, Inc.", "The Incredibles"]
+        \item Shows movies with similar themes, genres, or described with similar terms
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Machine Learning Algorithm: TF-IDF and Cosine Similarity}
+
+\begin{itemize}
+    \item \textbf{TF-IDF: Core Concept}
+    \begin{itemize}
+        \item Statistical measure used to evaluate word importance in a document within a collection
+        \item Increases proportionally to word frequency in document
+        \item Decreases as word appears in more documents (penalizes common words)
+        \item Balances local importance (TF) with global discrimination power (IDF)
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \item \textbf{Why TF-IDF Works for Recommendations}
+    \begin{itemize}
+        \item Creates content fingerprints that emphasize distinguishing terms
+        \item "Comedy" in many movies gets low weight (common across collection)
+        \item Specific actor names or unique genre combinations get high weight
+        \item Captures semantic similarity beyond simple keyword matching
+        \item Works well with unstructured or semi-structured textual metadata
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Training Process: From Text to Recommendations}
+\textbf{Complete TF-IDF Pipeline}
+\begin{enumerate}
+    \item \textbf{Corpus Creation}
+    \begin{itemize}
+        \item Assemble textual representation for each item
+        \item Clean and preprocess text (stopword removal, tokenization)
+    \end{itemize}
+    
+    \item \textbf{Vocabulary Building}
+    \begin{itemize}
+        \item Extract unique terms across all documents
+        \item Filter out rare terms to reduce noise
+    \end{itemize}
+    
+    \item \textbf{TF-IDF Calculation}
+    \begin{itemize}
+        \item Calculate term frequency in each document
+        \item Calculate inverse document frequency across corpus
+        \item Compute TF-IDF weights: $\text{tfidf}_{t,d} = \text{tf}_{t,d} \times \text{idf}_t$
+    \end{itemize}
+    
+    \item \textbf{Similarity Computation}
+    \begin{itemize}
+        \item Convert each document to a vector in term space
+        \item Compute cosine similarity between all document pairs
+        \item Store in similarity matrix for efficient lookup
+    \end{itemize}
+    
+    \item \textbf{Rating Prediction}
+    \begin{itemize}
+        \item Use content similarity to identify related items
+        \item Apply item-based collaborative filtering using similarity weights
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Advantages and Limitations of TF-IDF for Recommendations}
+
+\textbf{Advantages}
+\begin{itemize}
+    \item \textbf{Content Understanding}
+    \begin{itemize}
+        \item Captures semantic relationships between items
+        \item Works well with rich textual data (descriptions, reviews, tags)
+        \item No cold-start problem for new items with descriptive text
+    \end{itemize}
+    
+    \item \textbf{Technical Benefits}
+    \begin{itemize}
+        \item Intuitive and interpretable recommendations
+        \item Computationally efficient after initial preprocessing
+        \item Can work with minimal user preference data
+        \item Easily combined with other filtering approaches
+    \end{itemize}
+\end{itemize}
+
+\textbf{Limitations}
+\begin{itemize}
+    \item Cannot capture context or word meaning (just frequency)
+    \item Limited by quality and quantity of available text
+    \item May overemphasize rare but unimportant terms
+    \item Does not capture user-specific preferences beyond ratings
+    \item "Bag of words" approach loses word order and semantic structure
+\end{itemize}
+\end{frame}
+
+\end{document}
