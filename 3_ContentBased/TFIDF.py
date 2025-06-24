@@ -20,6 +20,10 @@ from collections import Counter
 # Libs used for AdaptedTFIDF
 from surprise import AlgoBase, PredictionImpossible
 
+# Libs to save and load models
+from datetime import datetime
+import pickle
+
 # Libs used for Evaluation
 from utils.LoadMovieLensData import LoadMovieLensData
 from EvaluationFramework.Evaluator import Evaluator
@@ -469,8 +473,11 @@ class AdaptedTFIDF(AlgoBase):
         """Initialize with k nearest neighbors and file paths"""
         AlgoBase.__init__(self)
         self.k = k
-        self.movies_file = movies_file or 'movie-recommender-system/ml-latest-small/movies.csv'
-        self.tags_file = tags_file or 'movie-recommender-system/ml-latest-small/tags.csv'
+        
+        # Fix: Use absolute paths with parent_dir
+        self.movies_file = movies_file or os.path.join(parent_dir, 'ml-latest-small', 'movies.csv')
+        self.tags_file = tags_file or os.path.join(parent_dir, 'ml-latest-small', 'tags.csv')
+        
         self.pure_tfidf = PureTFIDF(k=k)
         
     def fit(self, trainset):
@@ -530,6 +537,51 @@ class AdaptedTFIDF(AlgoBase):
         except ValueError:
             # Handle unknown items or users
             raise PredictionImpossible(f"User or item is unknown: {u}, {i}")
+        
+    def save_model(self, filename=None):
+        """
+        Save the trained model to disk
+        
+        Args:
+            filename: Path to save the model (if None, a default name will be generated)
+            
+        Returns:
+            str: Path where model was saved
+        """
+        if filename is None:
+            # Create a default filename with timestamp
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"../models/3_ContentBased/adapted_tf_idf_cos_model_{timestamp}.pkl"
+        
+        # Ensure the models directory exists
+        os.makedirs(os.path.dirname(filename) if os.path.dirname(filename) else '.', exist_ok=True)
+        
+        # Save the model using pickle
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
+        
+        print(f"Adapted model saved to {filename}")
+        return filename
+
+    @classmethod
+    def load_model(cls, filename):
+        """
+        Load a trained model from disk
+        
+        Args:
+            filename: Path to the saved model file
+            
+        Returns:
+            AdaptedUserKNN: Loaded model instance
+        """
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"Model file {filename} not found")
+        
+        with open(filename, 'rb') as f:
+            model = pickle.load(f)
+        
+        print(f"Adapted model loaded from {filename}")
+        return model
 
 
 # For testing and evaluation
@@ -555,12 +607,14 @@ if __name__ == "__main__":
     |---------------------------------|--------|-----------|
     | Random                          | 1.4385 |    1.1478 |
     | Content-Based Filtering         |--------|-----------|
-    | TF-IDF                          | 0.9553 |    0.7421 | 
+    | TF-IDF                          | 0.9545 |    0.7412 | 
     """
 
     # Run evaluation
     print("Evaluating algorithms...")
     evaluator.Evaluate(False)
+
+    tfidf_recommender.save_model()
     
     # Generate sample recommendations
     evaluator.SampleTopNRecs(ml)

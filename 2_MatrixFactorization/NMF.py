@@ -17,6 +17,10 @@ import random
 # Libs used for AdaptedNMF
 from surprise import AlgoBase, PredictionImpossible
 
+# Libs to save and load models
+from datetime import datetime
+import pickle
+
 # Libs used for Evaluation
 from utils.LoadMovieLensData import LoadMovieLensData
 from EvaluationFramework.Evaluator import Evaluator
@@ -553,6 +557,51 @@ class AdaptedNMF(AlgoBase):
             # Handle unknown items or users
             raise PredictionImpossible(f"User or item is unknown: {u}, {i}")
 
+    def save_model(self, filename=None):
+        """
+        Save the trained model to disk
+        
+        Args:
+            filename: Path to save the model (if None, a default name will be generated)
+            
+        Returns:
+            str: Path where model was saved
+        """
+        if filename is None:
+            # Create a default filename with timestamp
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"../models/2_MatrixFactorization/adapted_nmf_model_{timestamp}.pkl"
+        
+        # Ensure the models directory exists
+        os.makedirs(os.path.dirname(filename) if os.path.dirname(filename) else '.', exist_ok=True)
+        
+        # Save the model using pickle
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
+        
+        print(f"Adapted model saved to {filename}")
+        return filename
+
+    @classmethod
+    def load_model(cls, filename):
+        """
+        Load a trained model from disk
+        
+        Args:
+            filename: Path to the saved model file
+            
+        Returns:
+            AdaptedUserKNN: Loaded model instance
+        """
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"Model file {filename} not found")
+        
+        with open(filename, 'rb') as f:
+            model = pickle.load(f)
+        
+        print(f"Adapted model loaded from {filename}")
+        return model
+
 
 # For testing and evaluation
 if __name__ == "__main__":
@@ -583,6 +632,8 @@ if __name__ == "__main__":
     # Run evaluation
     print("Evaluating algorithms...")
     evaluator.Evaluate(False)
+
+    nmf_recommender.save_model()
     
     # Generate sample recommendations
     evaluator.SampleTopNRecs(ml)

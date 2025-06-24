@@ -17,6 +17,10 @@ import heapq
 # Libs used for AdaptedUserKNN
 from surprise import AlgoBase, PredictionImpossible
 
+# Libs to save and load models
+from datetime import datetime
+import pickle
+
 # Libs used for Evaluation
 from utils.LoadMovieLensData import LoadMovieLensData
 from EvaluationFramework.Evaluator import Evaluator
@@ -49,6 +53,7 @@ class PureUserKNN:
         self.items_rated_by_user = {}                      # Dictionary of item_id -> set of user_ids
         self.global_mean = 0                               # Global mean of all ratings (default rating)
     
+
     def fit(self, ratings_data):
         """
         Train the algorithm using pure Python (no external ML libraries)
@@ -200,6 +205,7 @@ class PureUserKNN:
         print("User-user similarity computation complete!")
         return self
     
+
     def _compute_similarity(self, user1, user2):
         """
         Compute similarity between two users based on their ratings
@@ -227,6 +233,7 @@ class PureUserKNN:
         else:  # Default to Pearson
             return self._compute_pearson_similarity(ratings1, ratings2, common_items, user1, user2)
     
+
     def _compute_cosine_similarity(self, ratings1, ratings2, common_items):
         """Compute cosine similarity between two sets of ratings"""
         # Extract ratings for common items
@@ -245,6 +252,7 @@ class PureUserKNN:
         
         return dot_product / (mag1 * mag2)                         # -> Calculate cosine similarity as dot_product / (mag1 * mag2), ex: cosine_similarity = 41 / (7.07 * 6.16) = 0.95
     
+
     def _compute_pearson_similarity(self, ratings1, ratings2, common_items, user1, user2):
         """Compute Pearson correlation between two sets of ratings"""
 
@@ -301,6 +309,7 @@ class PureUserKNN:
         
         return numerator / (math.sqrt(denom1) * math.sqrt(denom2)) # -> Calculate Pearson correlation as numerator / (sqrt(denom1) * sqrt(denom2)), ex: pearson_similarity = 1.0 / (sqrt(2.0) * sqrt(1.78)) = 0.500
     
+
     def predict(self, user_id, item_id):
         """
         Predict rating for a user-item pair using user-based CF
@@ -416,7 +425,6 @@ class PureUserKNN:
         
         return predicted_rating                                    # -> Return the predicted rating for the user-item pair, ex: return 3.489 for User 101 on Movie 203
 
-
 class AdaptedUserKNN(AlgoBase):
     """
     Adapter class that wraps PureUserKNN to make it compatible with Surprise's AlgoBase
@@ -490,6 +498,51 @@ class AdaptedUserKNN(AlgoBase):
             # Handle unknown items or users
             raise PredictionImpossible(f"User or item is unknown: {u}, {i}")
 
+    def save_model(self, filename=None):
+        """
+        Save the trained model to disk
+        
+        Args:
+            filename: Path to save the model (if None, a default name will be generated)
+            
+        Returns:
+            str: Path where model was saved
+        """
+        if filename is None:
+            # Create a default filename with timestamp
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            sim_name = self.sim_options.get('name', 'pearson')
+            filename = f"../models/1_UserBasedCollaborativeFiltering/adapted_user_knn_{sim_name}_model_{timestamp}.pkl"
+        
+        # Ensure the models directory exists
+        os.makedirs(os.path.dirname(filename) if os.path.dirname(filename) else '.', exist_ok=True)
+        
+        # Save the model using pickle
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
+        
+        print(f"Adapted model saved to {filename}")
+        return filename
+
+    @classmethod
+    def load_model(cls, filename):
+        """
+        Load a trained model from disk
+        
+        Args:
+            filename: Path to the saved model file
+            
+        Returns:
+            AdaptedUserKNN: Loaded model instance
+        """
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"Model file {filename} not found")
+        
+        with open(filename, 'rb') as f:
+            model = pickle.load(f)
+        
+        print(f"Adapted model loaded from {filename}")
+        return model
 
 # For testing and evaluation
 if __name__ == "__main__":
@@ -524,6 +577,9 @@ if __name__ == "__main__":
     # Run evaluation
     print("Evaluating algorithms...")
     evaluator.Evaluate(False)
+
+    userKNN_pearson.save_model()
+    userKNN_cosine.save_model()
     
     # Generate sample recommendations
     evaluator.SampleTopNRecs(ml)
